@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: carethia-db
+    environment:
+      POSTGRES_USER: carethia
+      POSTGRES_PASSWORD: carethia_dev
+      POSTGRES_DB: carethia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carethia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: carethia-api
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://carethia:carethia_dev@postgres:5432/carethia
+      API_PORT: 3001
+      API_HOST: http://localhost:3001
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./apps/api/src:/app/src
+    command: pnpm dev
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: carethia-web
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web/src:/app/src
+    command: pnpm dev
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: carethia-network

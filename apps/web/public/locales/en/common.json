@@ -1,0 +1,29 @@
+{
+  "appName": "Carethia",
+  "loading": "Loading...",
+  "bookNow": "Book Now",
+  "viewAll": "View All",
+  "learnMore": "Learn More",
+  "findCaregiver": "Find a Caregiver",
+  "iAmCaregiver": "I'm a Caregiver",
+  "hero": {
+    "badge": "Thailand's Trusted Care Platform",
+    "title": "Trusted Care,\nRight at Home",
+    "subtitle": "Connect with verified special-needs professionals — all carefully matched for your family's unique needs.",
+    "searchPlaceholder": "What kind of care do you need?",
+    "searchButton": "Find Caregivers"
+  },
+  "stats": {
+    "caregivers": "Verified Caregivers",
+    "families": "Families Served",
+    "rating": "Average Rating",
+    "support": "Support"
+  },
+  "services": {
+    "title": "Specialist Care for Every Family",
+    "subtitle": "Special needs support — all professionals are rigorously verified"
+  }
+}
+
+
+

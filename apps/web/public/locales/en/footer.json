@@ -1,0 +1,30 @@
+{
+  "tagline": "Trusted home support services for families across Thailand. Verified caregivers matched for your family's unique needs.",
+  "servicesTitle": "Services",
+  "companyTitle": "Company",
+  "supportTitle": "Support",
+  "copyright": "© 2026 Carethia. All rights reserved. Made with ❤️ for families across Thailand.",
+  "taglineBottom": "🌸 Trusted Home Support Ecosystem",
+  "services": {
+    "elderlyCaregivers": "Special Needs Caregivers",
+    "specialNeeds": "Special Needs Trainers"
+  },
+  "company": {
+    "aboutUs": "About Us",
+    "howItWorks": "How It Works",
+    "safety": "Safety & Trust",
+    "careers": "Careers",
+    "press": "Press",
+    "blog": "Blog"
+  },
+  "support": {
+    "helpCenter": "Help Center",
+    "contactUs": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy"
+  }
+}
+
+
+

@@ -1,0 +1,24 @@
+{
+  "name": "carethia",
+  "version": "1.0.0",
+  "description": "Women-Focused Home Support Ecosystem",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm --filter @carethia/shared build && pnpm --filter @carethia/db build && pnpm --filter @carethia/api build && pnpm --filter @carethia/web build",
+    "build:packages": "pnpm --filter @carethia/shared build && pnpm --filter @carethia/db build",
+    "lint": "pnpm -r run lint",
+    "type-check": "pnpm -r run type-check",
+    "db:migrate": "pnpm --filter @carethia/db migrate",
+    "db:seed": "pnpm --filter @carethia/db seed"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}
