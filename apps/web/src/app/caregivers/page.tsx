@@ -31,6 +31,7 @@ function CaregiversContent() {
   const [availableOnly, setAvailableOnly] = useState(Boolean(requestId))
   const [shift, setShift] = useState<'ALL' | 'DAY' | 'NIGHT'>('ALL')
   const [city, setCity] = useState<string>('ALL')
+  const [language, setLanguage] = useState<string>('ALL')
   const [dynamicCaregivers, setDynamicCaregivers] = useState<typeof mockCaregivers>([]) 
   const [loadingProfiles, setLoadingProfiles] = useState(true)
   const [compatibilityMap, setCompatibilityMap] = useState<Map<number, { score: number; summary: string }>>(new Map())
@@ -87,7 +88,8 @@ function CaregiversContent() {
       const matchAvail = !availableOnly || c.isAvailable
       const matchShift = shift === 'ALL' || c.shift === shift || c.shift === 'BOTH'
       const matchCity = city === 'ALL' || c.city === city
-      return matchSearch && matchService && matchPrice && matchVerified && matchAvail && matchCity && matchShift
+      const matchLanguage = language === 'ALL' || c.languages.map(l => l.toLowerCase()).includes(language.toLowerCase())
+      return matchSearch && matchService && matchPrice && matchVerified && matchAvail && matchCity && matchShift && matchLanguage
     })
 
     if (compatibilityMap.size > 0) {
@@ -95,7 +97,7 @@ function CaregiversContent() {
     }
 
     return list
-  }, [search, service, priceRange, verifiedOnly, availableOnly, shift, city, allCaregivers, compatibilityMap])
+  }, [search, service, priceRange, verifiedOnly, availableOnly, shift, city, language, allCaregivers, compatibilityMap])
 
   return (
     <Layout>
@@ -140,7 +142,7 @@ function CaregiversContent() {
               <Box display="flex" alignItems="center" gap={1} mb={3}>
                 <TuneIcon sx={{ color: '#FF6B9D' }} />
                 <Typography fontWeight={700} fontSize={16}>Filters</Typography>
-                <Button size="small" sx={{ ml: 'auto', color: '#FF6B9D', fontSize: 12 }} onClick={() => { setService('ALL'); setPriceRange([0, 1000]); setVerifiedOnly(false); setAvailableOnly(false); setSearch(''); setShift('ALL'); setCity('ALL') }}>Reset</Button>
+                <Button size="small" sx={{ ml: 'auto', color: '#FF6B9D', fontSize: 12 }} onClick={() => { setService('ALL'); setPriceRange([0, 1000]); setVerifiedOnly(false); setAvailableOnly(false); setSearch(''); setShift('ALL'); setCity('ALL'); setLanguage('ALL') }}>Reset</Button>
               </Box>
 
               <TextField
@@ -164,6 +166,15 @@ function CaregiversContent() {
               <Stack spacing={1} mb={3}>
                 {([['ALL', '🕐 All Hours'], ['DAY', '☀️ Day Care'], ['NIGHT', '🌙 Night Care']] as const).map(([val, label]) => (
                   <Chip key={val} label={label} onClick={() => setShift(val)} variant={shift === val ? 'filled' : 'outlined'} sx={{ justifyContent: 'flex-start', borderColor: shift === val ? '#FF6B9D' : undefined, bgcolor: shift === val ? '#FFF0F5' : undefined, color: shift === val ? '#FF6B9D' : undefined, fontWeight: shift === val ? 700 : 400 }} />
+                ))}
+              </Stack>
+
+              <Divider sx={{ mb: 3 }} />
+
+              <Typography fontWeight={600} fontSize={13} mb={1.5} color="text.secondary" letterSpacing={0.5}>LANGUAGE</Typography>
+              <Stack spacing={1} mb={3}>
+                {([['ALL', '🌐 All Languages'], ['Thai', '🇹🇭 Thai dialects'], ['English', '🇬🇧 English'], ['Myanmar', '🇲🇲 Myanmar'], ['Khmer', '🇰🇭 Khmer'], ['Filipino', '🇵🇭 Filipino']] as const).map(([val, label]) => (
+                  <Chip key={val} label={label} onClick={() => setLanguage(val)} variant={language === val ? 'filled' : 'outlined'} sx={{ justifyContent: 'flex-start', borderColor: language === val ? '#FF6B9D' : undefined, bgcolor: language === val ? '#FFF0F5' : undefined, color: language === val ? '#FF6B9D' : undefined, fontWeight: language === val ? 700 : 400 }} />
                 ))}
               </Stack>
 
