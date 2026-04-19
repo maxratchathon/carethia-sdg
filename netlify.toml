@@ -1,0 +1,17 @@
+[build]
+  base    = "apps/web"
+  command = "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @carethia/shared build && pnpm --filter @carethia/db build && pnpm --filter @carethia/web build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "9"
+
+[build.processing]
+  skip_processing = false
+
+[context.production.environment]
+  SECRETS_SCAN_OMIT_KEYS = "API_PORT,SMTP_FROM_NAME,NEXT_PUBLIC_API_URL,NEXT_PUBLIC_APP_URL"

@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import { CaregiverModule } from './caregiver/caregiver.module'
 import { BookingModule } from './booking/booking.module'
 import { UserModule } from './user/user.module'
+import { ContactModule } from './contact/contact.module'
 
 @Module({
     imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module'
         UserModule,
         CaregiverModule,
         BookingModule,
+        ContactModule,
     ],
     controllers: [AppController],
     providers: [AppService],

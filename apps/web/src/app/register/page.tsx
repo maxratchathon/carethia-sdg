@@ -2,29 +2,30 @@
 import React, { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import {
   Box, Container, Typography, Button, TextField, Paper,
   Stack, Alert, CircularProgress, Card, CardActionArea,
   Stepper, Step, StepLabel, Grid, Chip, Slider,
   FormGroup, FormControlLabel, Checkbox, InputAdornment,
 } from '@mui/material'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import PersonIcon from '@mui/icons-material/Person'
 import WorkIcon from '@mui/icons-material/Work'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import { useAuth } from '@/lib/auth-context'
 
 const SERVICES = [
-  { value: 'SPECIAL_NEEDS_TRAINER', label: 'Special Needs Care', icon: '🧠' },
+  { value: 'SPECIAL_NEEDS_TRAINER', icon: '🧠' },
 ]
 
 const CITIES = ['Bangkok', 'Nonthaburi', 'Pathum Thani', 'Samut Prakan', 'Chiang Mai', 'Phuket', 'Pattaya', 'Other']
 
-const STEPS = ['Choose Role', 'Account Info', 'Professional Details']
+const STEPS = ['role', 'account', 'professional']
 
 function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t } = useTranslation('auth')
   const { login } = useAuth()
 
   const initialRole = searchParams.get('role') === 'caregiver' ? 'CAREGIVER' : null
@@ -55,18 +56,18 @@ function RegisterForm() {
 
   const handleNext = () => {
     setError('')
-    if (activeStep === 0 && !role) { setError('Please select a role'); return }
+    if (activeStep === 0 && !role) { setError(t('register.errors.selectRole')); return }
     if (activeStep === 1) {
-      if (!firstName || !lastName || !email || !password) { setError('Please fill in all required fields'); return }
-      if (password.length < 6) { setError('Password must be at least 6 characters'); return }
+      if (!firstName || !lastName || !email || !password) { setError(t('register.errors.requiredFields')); return }
+      if (password.length < 6) { setError(t('register.errors.passwordLength')); return }
     }
     if (role === 'CUSTOMER' && activeStep === 1) {
       handleSubmit()
       return
     }
     if (activeStep === 2) {
-      if (services.length === 0) { setError('Please select at least one service'); return }
-      if (!bio.trim()) { setError('Please add a short bio'); return }
+      if (services.length === 0) { setError(t('register.errors.selectService')); return }
+      if (!bio.trim()) { setError(t('register.errors.shortBio')); return }
       handleSubmit()
       return
     }
@@ -90,13 +91,13 @@ function RegisterForm() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Registration failed. Please try again.')
+        setError(data.error || t('register.errors.registerFailed'))
         return
       }
       login(data.user)
       router.push('/dashboard')
     } catch {
-      setError('Network error. Please try again.')
+      setError(t('register.errors.network'))
     } finally {
       setLoading(false)
     }
@@ -111,18 +112,23 @@ function RegisterForm() {
         {/* Logo */}
         <Box textAlign="center" mb={4}>
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <FavoriteIcon sx={{ color: '#FF6B9D', fontSize: 32 }} />
+            <Box
+              component="img"
+              src="/locales/images/carethia_logo.png"
+              alt="Carethia logo"
+              sx={{ width: 32, height: 32, objectFit: 'contain' }}
+            />
             <Typography variant="h5" fontWeight={800} color="#FF6B9D">Carethia</Typography>
           </Link>
-          <Typography variant="h5" fontWeight={800} mt={1}>Create your account</Typography>
-          <Typography color="text.secondary" fontSize="0.9rem">Join Thailand&apos;s most trusted care platform</Typography>
+          <Typography variant="h5" fontWeight={800} mt={1}>{t('register.title')}</Typography>
+          <Typography color="text.secondary" fontSize="0.9rem">{t('register.subtitle')}</Typography>
         </Box>
 
         {/* Stepper */}
         <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-          {displaySteps.map((label) => (
-            <Step key={label}>
-              <StepLabel sx={{ '& .MuiStepLabel-label': { fontWeight: 600 } }}>{label}</StepLabel>
+          {displaySteps.map((stepKey) => (
+            <Step key={stepKey}>
+              <StepLabel sx={{ '& .MuiStepLabel-label': { fontWeight: 600 } }}>{t(`register.steps.${stepKey}`)}</StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -133,8 +139,8 @@ function RegisterForm() {
           {/* Step 0: Role */}
           {activeStep === 0 && (
             <Box>
-              <Typography variant="h6" fontWeight={700} mb={0.5}>I am a...</Typography>
-              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>Choose how you want to use Carethia</Typography>
+              <Typography variant="h6" fontWeight={700} mb={0.5}>{t('register.roleTitle')}</Typography>
+              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>{t('register.roleSubtitle')}</Typography>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <Card
@@ -149,8 +155,8 @@ function RegisterForm() {
                   >
                     <CardActionArea sx={{ p: 3, textAlign: 'center' }}>
                       <Box fontSize={40} mb={1}>👨‍👩‍👧</Box>
-                      <Typography fontWeight={700}>Customer</Typography>
-                      <Typography variant="caption" color="text.secondary">Looking for a caregiver</Typography>
+                      <Typography fontWeight={700}>{t('register.customer')}</Typography>
+                      <Typography variant="caption" color="text.secondary">{t('register.customerDesc')}</Typography>
                       {role === 'CUSTOMER' && <CheckCircleIcon sx={{ color: '#FF6B9D', fontSize: 20, mt: 1, display: 'block', mx: 'auto' }} />}
                     </CardActionArea>
                   </Card>
@@ -168,8 +174,8 @@ function RegisterForm() {
                   >
                     <CardActionArea sx={{ p: 3, textAlign: 'center' }}>
                       <Box fontSize={40} mb={1}>🛡️</Box>
-                      <Typography fontWeight={700}>Caregiver</Typography>
-                      <Typography variant="caption" color="text.secondary">I want to provide care</Typography>
+                      <Typography fontWeight={700}>{t('register.caregiver')}</Typography>
+                      <Typography variant="caption" color="text.secondary">{t('register.caregiverDesc')}</Typography>
                       {role === 'CAREGIVER' && <CheckCircleIcon sx={{ color: '#2ECC71', fontSize: 20, mt: 1, display: 'block', mx: 'auto' }} />}
                     </CardActionArea>
                   </Card>
@@ -181,30 +187,30 @@ function RegisterForm() {
           {/* Step 1: Account Info */}
           {activeStep === 1 && (
             <Box>
-              <Typography variant="h6" fontWeight={700} mb={0.5}>Account details</Typography>
-              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>Create your login credentials</Typography>
+              <Typography variant="h6" fontWeight={700} mb={0.5}>{t('register.accountTitle')}</Typography>
+              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>{t('register.accountSubtitle')}</Typography>
               <Stack spacing={2.5}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <TextField
-                    fullWidth label="First Name" value={firstName} onChange={e => setFirstName(e.target.value)} required
+                    fullWidth label={t('register.firstName')} value={firstName} onChange={e => setFirstName(e.target.value)} required
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                   />
                   <TextField
-                    fullWidth label="Last Name" value={lastName} onChange={e => setLastName(e.target.value)} required
+                    fullWidth label={t('register.lastName')} value={lastName} onChange={e => setLastName(e.target.value)} required
                     sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                   />
                 </Box>
                 <TextField
-                  fullWidth label="Email address" type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                  fullWidth label={t('register.email')} type="email" value={email} onChange={e => setEmail(e.target.value)} required
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                 />
                 <TextField
-                  fullWidth label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required
-                  helperText="Minimum 6 characters"
+                  fullWidth label={t('register.password')} type="password" value={password} onChange={e => setPassword(e.target.value)} required
+                  helperText={t('register.passwordHelp')}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                 />
                 <TextField
-                  fullWidth label="Phone number (optional)" value={phone} onChange={e => setPhone(e.target.value)}
+                  fullWidth label={t('register.phone')} value={phone} onChange={e => setPhone(e.target.value)}
                   placeholder="0812345678"
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                 />
@@ -215,16 +221,16 @@ function RegisterForm() {
           {/* Step 2: Caregiver Professional Details */}
           {activeStep === 2 && role === 'CAREGIVER' && (
             <Box>
-              <Typography variant="h6" fontWeight={700} mb={0.5}>Professional profile</Typography>
-              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>Help families find you more easily</Typography>
+              <Typography variant="h6" fontWeight={700} mb={0.5}>{t('register.professionalTitle')}</Typography>
+              <Typography color="text.secondary" fontSize="0.9rem" mb={3}>{t('register.professionalSubtitle')}</Typography>
               <Stack spacing={3}>
                 <Box>
-                  <Typography fontWeight={600} mb={1.5}>Services you offer *</Typography>
+                  <Typography fontWeight={600} mb={1.5}>{t('register.services')}</Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {SERVICES.map(s => (
                       <Chip
                         key={s.value}
-                        label={`${s.icon} ${s.label}`}
+                        label={`${s.icon} ${t('register.serviceSpecialNeeds')}`}
                         onClick={() => toggleService(s.value)}
                         color={services.includes(s.value) ? 'primary' : 'default'}
                         variant={services.includes(s.value) ? 'filled' : 'outlined'}
@@ -235,7 +241,7 @@ function RegisterForm() {
                 </Box>
 
                 <Box>
-                  <Typography fontWeight={600} mb={2}>Hourly rate: ฿{hourlyRate}/hr</Typography>
+                  <Typography fontWeight={600} mb={2}>{t('register.hourlyRate')}: ฿{hourlyRate}/hr</Typography>
                   <Slider
                     value={hourlyRate} onChange={(_, v) => setHourlyRate(v as number)}
                     min={100} max={800} step={50}
@@ -245,7 +251,7 @@ function RegisterForm() {
                 </Box>
 
                 <Box>
-                  <Typography fontWeight={600} mb={1}>Experience (years): {experience}</Typography>
+                  <Typography fontWeight={600} mb={1}>{t('register.experience')}: {experience}</Typography>
                   <Slider
                     value={experience} onChange={(_, v) => setExperience(v as number)}
                     min={0} max={20} step={1}
@@ -255,11 +261,11 @@ function RegisterForm() {
                 </Box>
 
                 <Box>
-                  <Typography fontWeight={600} mb={1}>City</Typography>
+                  <Typography fontWeight={600} mb={1}>{t('register.city')}</Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {CITIES.map(c => (
                       <Chip
-                        key={c} label={c}
+                        key={c} label={t(`register.cities.${c}`)}
                         onClick={() => setCity(c)}
                         color={city === c ? 'secondary' : 'default'}
                         variant={city === c ? 'filled' : 'outlined'}
@@ -270,14 +276,14 @@ function RegisterForm() {
                 </Box>
 
                 <TextField
-                  fullWidth label="Short bio *" multiline rows={3} value={bio} onChange={e => setBio(e.target.value)}
-                  placeholder="Tell families about your experience, caring style, and what makes you special..."
+                  fullWidth label={t('register.shortBio')} multiline rows={3} value={bio} onChange={e => setBio(e.target.value)}
+                  placeholder={t('register.shortBioPlaceholder')}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                 />
 
                 <TextField
-                  fullWidth label="Certifications (optional)" value={certifications} onChange={e => setCertifications(e.target.value)}
-                  placeholder="e.g. First Aid, CPR, Nursing License..."
+                  fullWidth label={t('register.certifications')} value={certifications} onChange={e => setCertifications(e.target.value)}
+                  placeholder={t('register.certificationsPlaceholder')}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                 />
               </Stack>
@@ -290,7 +296,7 @@ function RegisterForm() {
               variant="outlined" onClick={() => activeStep > 0 ? setActiveStep(s => s - 1) : router.back()}
               sx={{ borderRadius: 3, borderColor: 'grey.200', color: 'text.secondary', fontWeight: 600 }}
             >
-              Back
+              {t('register.back')}
             </Button>
             <Button
               variant="contained" onClick={handleNext} disabled={loading}
@@ -300,15 +306,15 @@ function RegisterForm() {
               }}
             >
               {loading ? <CircularProgress size={22} color="inherit" /> : (
-                activeStep === totalSteps - 1 ? '🎉 Create Account' : 'Continue →'
+                activeStep === totalSteps - 1 ? `🎉 ${t('register.createAccount')}` : `${t('register.continue')} →`
               )}
             </Button>
           </Stack>
 
           <Box mt={3} textAlign="center">
             <Typography variant="body2" color="text.secondary">
-              Already have an account?{' '}
-              <Link href="/login" style={{ color: '#FF6B9D', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
+              {t('register.alreadyAccount')}{' '}
+              <Link href="/login" style={{ color: '#FF6B9D', fontWeight: 700, textDecoration: 'none' }}>{t('register.signIn')}</Link>
             </Typography>
           </Box>
         </Paper>

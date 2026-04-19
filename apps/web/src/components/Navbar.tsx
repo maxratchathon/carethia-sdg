@@ -20,9 +20,11 @@ import { getTier } from '@/lib/store'
 
 const NAV_KEYS = [
   { key: 'findCaregivers', href: '/caregivers' },
+  { key: 'aboutUs', href: '/about-us' },
   { key: 'pricing', href: '/#pricing' },
   { key: 'forCaregivers', href: '/for-caregivers' },
   { key: 'events', href: '/events' },
+  { key: 'contactUs', href: '/contact-us' },
 ]
 
 export default function Navbar() {
@@ -31,12 +33,15 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const tier = user ? getTier(user.points ?? 0) : null
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [lang, setLang] = useState<'en' | 'th'>('en')
+  const [lang, setLang] = useState<'en' | 'th'>(i18n.language.startsWith('th') ? 'th' : 'en')
   const [langAnchor, setLangAnchor] = useState<null | HTMLElement>(null)
   const [userAnchor, setUserAnchor] = useState<null | HTMLElement>(null)
 
   const switchLocale = (locale: 'en' | 'th') => {
     i18n.changeLanguage(locale)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('carethia_lang', locale)
+    }
     setLang(locale)
     setLangAnchor(null)
   }
@@ -137,18 +142,18 @@ export default function Navbar() {
                     </Box>
                     <MenuItem component={Link} href="/dashboard" onClick={() => setUserAnchor(null)} sx={{ gap: 1.5, py: 1.25 }}>
                       <DashboardIcon fontSize="small" sx={{ color: '#FF6B9D' }} />
-                      <Typography fontWeight={600} fontSize={14}>Dashboard</Typography>
+                      <Typography fontWeight={600} fontSize={14}>{t('dashboard')}</Typography>
                     </MenuItem>
                     {user.role === 'CAREGIVER' && (
                       <MenuItem component={Link} href="/caregiver-portal" onClick={() => setUserAnchor(null)} sx={{ gap: 1.5, py: 1.25 }}>
                         <Box component="span" sx={{ fontSize: 16, lineHeight: 1 }}>🛡️</Box>
-                        <Typography fontWeight={600} fontSize={14}>Caregiver Portal</Typography>
+                        <Typography fontWeight={600} fontSize={14}>{t('caregiverPortal')}</Typography>
                       </MenuItem>
                     )}
                     <Divider />
                     <MenuItem onClick={() => { logout(); setUserAnchor(null) }} sx={{ gap: 1.5, py: 1.25, color: '#E74C3C' }}>
                       <LogoutIcon fontSize="small" />
-                      <Typography fontWeight={600} fontSize={14}>Sign Out</Typography>
+                      <Typography fontWeight={600} fontSize={14}>{t('signOut')}</Typography>
                     </MenuItem>
                   </Menu>
                 </>
@@ -229,8 +234,8 @@ export default function Navbar() {
                     <Typography variant="caption" color="text.secondary">{user.email}</Typography>
                   </Box>
                 </Box>
-                <Button fullWidth variant="outlined" component={Link} href="/dashboard" onClick={() => setDrawerOpen(false)} sx={{ borderRadius: 6, borderColor: '#FF6B9D', color: '#FF6B9D' }}>Dashboard</Button>
-                <Button fullWidth variant="outlined" onClick={() => { logout(); setDrawerOpen(false) }} sx={{ borderRadius: 6, borderColor: '#E74C3C', color: '#E74C3C' }}>Sign Out</Button>
+                <Button fullWidth variant="outlined" component={Link} href="/dashboard" onClick={() => setDrawerOpen(false)} sx={{ borderRadius: 6, borderColor: '#FF6B9D', color: '#FF6B9D' }}>{t('dashboard')}</Button>
+                <Button fullWidth variant="outlined" onClick={() => { logout(); setDrawerOpen(false) }} sx={{ borderRadius: 6, borderColor: '#E74C3C', color: '#E74C3C' }}>{t('signOut')}</Button>
               </>
             ) : (
               <>

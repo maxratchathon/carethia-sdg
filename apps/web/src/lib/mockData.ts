@@ -1,4 +1,4 @@
-export type ServiceType = 'SPECIAL_NEEDS_TRAINER'
+export type ServiceType = 'SPECIAL_NEEDS_TRAINER' | 'DAILY_LIVING_COMPANION'
 
 export interface MockCaregiver {
     id: number
@@ -35,7 +35,8 @@ export interface MockReview {
 }
 
 export const SERVICE_LABELS: Record<ServiceType, string> = {
-    SPECIAL_NEEDS_TRAINER: 'Special Needs Care',
+    SPECIAL_NEEDS_TRAINER: 'Child Development Support',
+    DAILY_LIVING_COMPANION: 'Daily Living & Companion Care',
 }
 
 export const COMMISSION_RATE = 0.15
@@ -46,19 +47,23 @@ export const INSURANCE_FEE = 49       // flat ฿49 insurance cover per booking
 
 export const SERVICE_BASE_PRICE: Record<ServiceType, number> = {
     SPECIAL_NEEDS_TRAINER: 1500,
+    DAILY_LIVING_COMPANION: 1200,
 }
 
 // Final price customer pays (caregiver rate + service fee + insurance)
 export const CUSTOMER_RATE: Record<ServiceType, Record<'DAY' | 'NIGHT' | 'BOTH', number>> = {
     SPECIAL_NEEDS_TRAINER: { DAY: 390, NIGHT: 490, BOTH: 390 },
+    DAILY_LIVING_COMPANION: { DAY: 320, NIGHT: 420, BOTH: 320 },
 }
 
 export const SERVICE_ICONS: Record<ServiceType, string> = {
-    SPECIAL_NEEDS_TRAINER: '🧠',
+    SPECIAL_NEEDS_TRAINER: '🧩',
+    DAILY_LIVING_COMPANION: '🤝',
 }
 
 export const SERVICE_COLORS: Record<ServiceType, string> = {
     SPECIAL_NEEDS_TRAINER: '#9B59B6',
+    DAILY_LIVING_COMPANION: '#27AE60',
 }
 
 export const mockCaregivers: MockCaregiver[] = [
@@ -90,8 +95,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Malee',
         lastName: 'Thanakit',
         avatar: 'https://i.pravatar.cc/150?img=45',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Registered nurse with 10 years of clinical experience. Specialized in post-operative care, wound management, and chronic disease management. Compassionate, professional, and always on time.',
         experience: 10,
         hourlyRate: 400,
@@ -113,8 +118,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Pornpan',
         lastName: 'Wattana',
         avatar: 'https://i.pravatar.cc/150?img=44',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Dedicated special needs companion with 8 years of experience supporting individuals with physical and developmental disabilities. Trained in sensory integration, adaptive communication, and daily skill building.',
         experience: 8,
         hourlyRate: 300,
@@ -182,8 +187,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Suda',
         lastName: 'Pimchanok',
         avatar: 'https://i.pravatar.cc/150?img=43',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Compassionate special-needs caregiver with 12 years of experience. Skilled in mobility assistance, medication reminders, behavior support, and companionship. Background in occupational therapy.',
         experience: 12,
         hourlyRate: 500,
@@ -205,8 +210,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Lalita',
         lastName: 'Boonmee',
         avatar: 'https://i.pravatar.cc/150?img=49',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Gentle and experienced night caregiver specializing in sleep support, fall prevention, and overnight monitoring for people with special needs. Trusted by families across Thailand for 5+ years.',
         experience: 5,
         hourlyRate: 500,
@@ -251,8 +256,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Wipawan',
         lastName: 'Siriporn',
         avatar: 'https://i.pravatar.cc/150?img=39',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Dedicated day caregiver for people with special needs with Alzheimer\'s and Parkinson\'s. Trained in reality orientation therapy and gentle exercise routines. Speaks clear, calm Thai to ease anxiety.',
         experience: 8,
         hourlyRate: 400,
@@ -297,8 +302,8 @@ export const mockCaregivers: MockCaregiver[] = [
         firstName: 'Kanya',
         lastName: 'Phommasak',
         avatar: 'https://i.pravatar.cc/150?img=33',
-        service: 'SPECIAL_NEEDS_TRAINER',
-        services: ['SPECIAL_NEEDS_TRAINER'],
+        service: 'DAILY_LIVING_COMPANION',
+        services: ['DAILY_LIVING_COMPANION'],
         bio: 'Night nurse with ICU background, now focusing on home-based overnight special needs care. Expert in managing chronic conditions, night medication schedules, and emergency response.',
         experience: 11,
         hourlyRate: 500,

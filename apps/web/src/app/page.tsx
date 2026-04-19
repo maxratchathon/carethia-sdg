@@ -2,6 +2,7 @@
 import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 import {
   Box, Container, Typography, Button, Grid, Card, CardContent,
   Avatar, Rating, Stack, Chip, Paper, Divider,
@@ -23,7 +24,7 @@ const PROGRAMS: {
   title: string
   subtitle: string
   details: string
-  icon: string
+  image: string
   color: string
   bg: string
 }[] = [
@@ -33,7 +34,7 @@ const PROGRAMS: {
     title: 'Child Development Support',
     subtitle: 'ADHD, autism, and learning support',
     details: 'Structured sessions focused on communication, routines, emotional regulation, and confidence building.',
-    icon: '🧩',
+    image: '/locales/images/development-support.png',
     color: '#6C63FF',
     bg: '#F3F2FF',
   },
@@ -43,7 +44,7 @@ const PROGRAMS: {
     title: 'Daily Living & Companion Care',
     subtitle: 'Reliable special-needs support at home and outside',
     details: 'Special-needs care assistance with hygiene, meals, mobility, social activities, and day-to-day wellbeing for children, teens, and adults.',
-    icon: '🤝',
+    image: '/locales/images/daily-care.png',
     color: '#1F9D8A',
     bg: '#EDFFFB',
   },
@@ -57,9 +58,9 @@ const STATS = [
 ]
 
 const HOW_IT_WORKS = [
-  { step: '01', icon: '🔍', title: 'Tell Us Your Needs', desc: 'Share details about your family, schedule, special requirements, and preferences.' },
-  { step: '02', icon: '🔎', title: 'Get Matched', desc: 'We review 50+ factors to find your perfect caregiver — from personality to proximity.' },
-  { step: '03', icon: '✅', title: 'Book with Confidence', desc: 'Every caregiver is background-checked and verified. Book instantly with full safety guarantee.' },
+  { step: '01', icon: '📝', title: 'Tell Us Your Needs', desc: 'Share details about your family, schedule, special requirements, and preferences.' },
+  { step: '02', icon: '🤝', title: 'Get Matched', desc: 'We review 50+ factors to find your perfect caregiver — from personality to proximity.' },
+  { step: '03', icon: '😌', title: 'Book with Confidence', desc: 'Every caregiver is background-checked and verified. Book instantly with full safety guarantee.' },
 ]
 
 const TESTIMONIALS = [
@@ -103,6 +104,43 @@ const HOW_TO_EARN = [
 ]
 
 export default function Home() {
+  const { t } = useTranslation('home')
+
+  const programs = PROGRAMS.map((program) => {
+    if (program.id === 'child-development') {
+      return {
+        ...program,
+        title: t('service1'),
+        subtitle: t('service1Subtitle'),
+        details: t('service1Description'),
+      }
+    }
+
+    if (program.id === 'daily-living') {
+      return {
+        ...program,
+        title: t('service2'),
+        subtitle: t('service2Subtitle'),
+        details: t('service2Description'),
+      }
+    }
+
+    return program
+  })
+
+  const stats = [
+    { value: '50+', label: t('statsVerifiedProfessionals') },
+    { value: '98%', label: t('statsSatisfactionRate') },
+    { value: '1,200+', label: t('statsFamiliesSupported') },
+    { value: '4.9★', label: t('statsAverageRating') },
+  ]
+
+  const howItWorks = [
+    { step: '01', icon: '📝', title: t('step1Title'), desc: t('step1Desc') },
+    { step: '02', icon: '🤝', title: t('step2Title'), desc: t('step2Desc') },
+    { step: '03', icon: '😌', title: t('step3Title'), desc: t('step3Desc') },
+  ]
+
   return (
     <Layout>
       {/* Hero */}
@@ -111,24 +149,24 @@ export default function Home() {
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Chip label="🏆 Trusted Special-Needs Care Platform" sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 3, border: '1px solid #FFCCE4' }} />
+              <Chip label={`🏆 ${t('heroBadge')}`} sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 3, border: '1px solid #FFCCE4' }} />
               <Typography variant="h2" fontWeight={800} lineHeight={1.1} mb={2.5} sx={{ fontSize: { xs: '2.2rem', md: '3rem' } }}>
-                Find Trusted Care
-                <Box component="span" sx={{ color: '#FF6B9D', display: 'block' }}>For Every Unique Needs</Box>
+                {t('heroTitleMain')}
+                <Box component="span" sx={{ color: '#FF6B9D', display: 'block' }}>{t('heroTitleAccent')}</Box>
               </Typography>
               <Typography variant="h6" color="text.secondary" fontWeight={400} lineHeight={1.7} mb={4} sx={{ fontSize: '1.05rem' }}>
-                Background-verified specialists across Thailand for special-needs care.
+                {t('heroSubtitle')}
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={4}>
                 <Button variant="contained" size="large" component={Link} href="/caregivers" endIcon={<ArrowForwardIcon />} sx={{ background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', borderRadius: 6, px: 4, py: 1.5, fontWeight: 700, boxShadow: '0 6px 20px rgba(255,107,157,0.4)' }}>
-                  Find a Caregiver
+                  {t('heroPrimaryCta')}
                 </Button>
                 <Button variant="outlined" size="large" sx={{ borderRadius: 6, px: 4, py: 1.5, fontWeight: 600, borderColor: '#FF6B9D', color: '#FF6B9D', '&:hover': { bgcolor: '#FFF0F5' } }}>
-                  I&apos;m a Caregiver
+                  {t('heroSecondaryCta')}
                 </Button>
               </Stack>
               <Stack direction="row" spacing={2} flexWrap="wrap">
-                {[{ icon: <ShieldIcon sx={{ fontSize: 16 }} />, label: 'Background Checked' }, { icon: <VerifiedIcon sx={{ fontSize: 16 }} />, label: 'Skill Verified' }, { icon: <StarIcon sx={{ fontSize: 16 }} />, label: '4.9 Avg Rating' }].map((badge) => (
+                {[{ icon: <ShieldIcon sx={{ fontSize: 16 }} />, label: t('heroTrust1') }, { icon: <VerifiedIcon sx={{ fontSize: 16 }} />, label: t('heroTrust2') }, { icon: <StarIcon sx={{ fontSize: 16 }} />, label: t('heroTrust3') }].map((badge) => (
                   <Box key={badge.label} display="flex" alignItems="center" gap={0.5} sx={{ color: 'text.secondary' }}>
                     {badge.icon}
                     <Typography variant="caption" fontWeight={600}>{badge.label}</Typography>
@@ -162,7 +200,7 @@ export default function Home() {
       <Box sx={{ bgcolor: '#1a1a2e', py: 4 }}>
         <Container maxWidth="lg">
           <Grid container spacing={2} justifyContent="center">
-            {STATS.map((stat) => (
+            {stats.map((stat) => (
               <Grid item xs={6} sm={3} key={stat.label} textAlign="center">
                 <Typography fontWeight={800} fontSize={28} color="#FF6B9D">{stat.value}</Typography>
                 <Typography variant="body2" color="grey.400">{stat.label}</Typography>
@@ -176,18 +214,62 @@ export default function Home() {
       <Box sx={{ py: 10, bgcolor: 'white' }}>
         <Container maxWidth="lg">
           <Box textAlign="center" mb={6}>
-            <Chip label="Special Needs Programs" sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 2 }} />
-            <Typography variant="h3" fontWeight={800} mb={1.5}>One Service, Two Focused Programs</Typography>
-            <Typography color="text.secondary" maxWidth={620} mx="auto">Every program is delivered by background-verified special-needs professionals and tailored to your family&apos;s goals.</Typography>
+            <Chip label={t('servicesChip')} sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 2 }} />
+            <Typography variant="h3" fontWeight={800} mb={1.5}>{t('servicesSectionTitle')}</Typography>
+            <Typography color="text.secondary" maxWidth={620} mx="auto">{t('servicesSectionDescription')}</Typography>
           </Box>
           <Grid container spacing={3}>
-            {PROGRAMS.map(({ id, type, title, subtitle, details, icon, color, bg }) => (
+            {programs.map(({ id, type, title, subtitle, details, image, color, bg }) => (
               <Grid item xs={12} sm={6} md={6} key={id}>
-                <Card component={Link} href={`/caregivers?service=${type}`} sx={{ textDecoration: 'none', p: 3.5, borderRadius: 4, bgcolor: bg, boxShadow: 'none', border: '1px solid transparent', transition: 'all 0.2s', '&:hover': { borderColor: color, transform: 'translateY(-4px)', boxShadow: `0 8px 24px ${color}30` }, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <Typography fontSize={34} mb={1.25}>{icon}</Typography>
-                  <Typography fontWeight={800} fontSize={20} mb={0.5} color="#1a1a2e">{title}</Typography>
-                  <Typography fontWeight={600} fontSize={14} color={color} mb={1.5}>{subtitle}</Typography>
-                  <Typography color="text.secondary" fontSize={14} lineHeight={1.7}>{details}</Typography>
+                <Card
+                  component={Link}
+                  href={`/caregivers?service=${type}`}
+                  sx={{
+                    textDecoration: 'none',
+                    borderRadius: 4,
+                    bgcolor: bg,
+                    boxShadow: 'none',
+                    border: '1px solid transparent',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      borderColor: color,
+                      transform: 'translateY(-4px)',
+                      boxShadow: `0 8px 24px ${color}30`,
+                    },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: { xs: 200, sm: 220, md: 240 },
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: bg,
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={image}
+                      alt={title}
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        transform: 'scale(1.08)',
+                      }}
+                    />
+                  </Box>
+
+                  <Box sx={{ p: 3.5 }}>
+                    <Typography fontWeight={800} fontSize={20} mb={0.5} color="#1a1a2e">{title}</Typography>
+                    <Typography fontWeight={600} fontSize={14} color={color} mb={1.5}>{subtitle}</Typography>
+                    <Typography color="text.secondary" fontSize={14} lineHeight={1.7}>{details}</Typography>
+                  </Box>
                 </Card>
               </Grid>
             ))}
@@ -199,12 +281,12 @@ export default function Home() {
       <Box id="how-it-works" sx={{ py: 10, bgcolor: '#FAFAFA' }}>
         <Container maxWidth="md">
           <Box textAlign="center" mb={6}>
-            <Chip label="How It Works" sx={{ bgcolor: '#F3F2FF', color: '#6C63FF', fontWeight: 600, mb: 2 }} />
-            <Typography variant="h3" fontWeight={800} mb={1}>Booked in Minutes</Typography>
-            <Typography color="text.secondary">Find your perfect match — so you can focus on what matters.</Typography>
+            <Chip label={t('howItWorksChip')} sx={{ bgcolor: '#F3F2FF', color: '#6C63FF', fontWeight: 600, mb: 2 }} />
+            <Typography variant="h3" fontWeight={800} mb={1}>{t('howItWorksTitle')}</Typography>
+            <Typography color="text.secondary">{t('howItWorksSubtitle')}</Typography>
           </Box>
           <Grid container spacing={4}>
-            {HOW_IT_WORKS.map((step) => (
+            {howItWorks.map((step) => (
               <Grid item xs={12} md={4} key={step.step}>
                 <Box textAlign="center">
                   <Box sx={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9D20, #C06C8430)', display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2, fontSize: 28 }}>{step.icon}</Box>
@@ -223,20 +305,20 @@ export default function Home() {
         <Container maxWidth="md">
           <Paper variant="outlined" sx={{ borderRadius: 5, p: { xs: 3, md: 5 }, borderColor: '#FFD6E8', background: 'linear-gradient(135deg, #FFF8FC 0%, #F9F4FF 100%)' }}>
             <Box textAlign="center" mb={3}>
-              <Chip label="About Us" sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 2 }} />
-              <Typography variant="h3" fontWeight={800} mb={1.5}>Built from Real Family Experience</Typography>
+              <Chip label={t('aboutChip')} sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 2 }} />
+              <Typography variant="h3" fontWeight={800} mb={1.5}>{t('aboutTitle')}</Typography>
             </Box>
             <Typography color="text.secondary" fontSize={{ xs: 15, md: 16 }} lineHeight={1.9} textAlign="center" mb={2.5}>
-              Carethia started from one family&apos;s care journey and grew into a trusted platform that connects special-needs families with verified, compatible caregivers.
+              {t('aboutDescription')}
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} justifyContent="center" alignItems="center" mb={4}>
-              <Chip label="Verified caregivers" size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
-              <Chip label="Transparent booking" size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
-              <Chip label="Long-term family support" size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
+              <Chip label={t('aboutPill1')} size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
+              <Chip label={t('aboutPill2')} size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
+              <Chip label={t('aboutPill3')} size="small" sx={{ bgcolor: 'white', border: '1px solid #FFD6E8', color: '#7A4A5B', fontWeight: 600 }} />
             </Stack>
             <Box textAlign="center">
               <Button component={Link} href="/about-us" variant="contained" size="large" endIcon={<ArrowForwardIcon />} sx={{ background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', borderRadius: 6, px: 4, fontWeight: 700, boxShadow: '0 6px 20px rgba(255,107,157,0.35)' }}>
-                View More
+                {t('viewMore')}
               </Button>
             </Box>
           </Paper>
@@ -248,10 +330,10 @@ export default function Home() {
         <Container maxWidth="lg">
           <Box display="flex" justifyContent="space-between" alignItems="flex-end" mb={5}>
             <Box>
-              <Chip label="Top Rated" sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 1 }} />
-              <Typography variant="h3" fontWeight={800}>Meet Our Caregivers</Typography>
+              <Chip label={t('featuredChip')} sx={{ bgcolor: '#FFF0F5', color: '#FF6B9D', fontWeight: 600, mb: 1 }} />
+              <Typography variant="h3" fontWeight={800}>{t('featuredTitle')}</Typography>
             </Box>
-            <Button component={Link} href="/caregivers" endIcon={<ArrowForwardIcon />} sx={{ color: '#FF6B9D', fontWeight: 600, display: { xs: 'none', sm: 'flex' } }}>View All</Button>
+            <Button component={Link} href="/caregivers" endIcon={<ArrowForwardIcon />} sx={{ color: '#FF6B9D', fontWeight: 600, display: { xs: 'none', sm: 'flex' } }}>{t('viewAll')}</Button>
           </Box>
           <Grid container spacing={3}>
             {mockCaregivers.slice(0, 6).map((caregiver) => (
@@ -261,7 +343,7 @@ export default function Home() {
             ))}
           </Grid>
           <Box textAlign="center" mt={5}>
-            <Button variant="outlined" size="large" component={Link} href="/caregivers" startIcon={<SearchIcon />} sx={{ borderRadius: 6, px: 4, borderColor: '#FF6B9D', color: '#FF6B9D' }}>Browse All Caregivers</Button>
+            <Button variant="outlined" size="large" component={Link} href="/caregivers" startIcon={<SearchIcon />} sx={{ borderRadius: 6, px: 4, borderColor: '#FF6B9D', color: '#FF6B9D' }}>{t('browseAll')}</Button>
           </Box>
         </Container>
       </Box>
@@ -435,10 +517,10 @@ export default function Home() {
         <Container maxWidth="sm">
           <Box textAlign="center" sx={{ background: 'linear-gradient(135deg, #FFF0F5, #F3F2FF)', borderRadius: 6, p: { xs: 4, md: 7 }, border: '1px solid #FFD6E8' }}>
             <Typography fontSize={48} mb={2}>🌸</Typography>
-            <Typography variant="h4" fontWeight={800} mb={1.5}>Ready to Get Started?</Typography>
-            <Typography color="text.secondary" mb={4}>Join families across Thailand who trust Carethia for specialised support at home.</Typography>
+            <Typography variant="h4" fontWeight={800} mb={1.5}>{t('finalTitle')}</Typography>
+            <Typography color="text.secondary" mb={4}>{t('finalSubtitle')}</Typography>
             <Button variant="contained" size="large" component={Link} href="/caregivers" sx={{ background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', borderRadius: 6, px: 5, py: 1.5, fontWeight: 700, boxShadow: '0 6px 20px rgba(255,107,157,0.4)' }}>
-              Find Your Caregiver
+              {t('finalCta')}
             </Button>
           </Box>
         </Container>

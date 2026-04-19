@@ -14,20 +14,30 @@ export default function Footer() {
   const columns = [
     {
       title: t('servicesTitle'),
-      links: [t('services.specialNeeds')],
+      links: [
+        { label: t('services.childDevelopment'), href: '/caregivers?service=SPECIAL_NEEDS_TRAINER' },
+        { label: t('services.dailyLiving'), href: '/caregivers?service=DAILY_LIVING_COMPANION' },
+      ],
     },
     {
       title: t('companyTitle'),
       links: [
-        t('company.aboutUs'), t('company.howItWorks'), t('company.safety'),
-        t('company.careers'), t('company.press'), t('company.blog'),
+        { label: t('company.aboutUs'), href: '/about-us' },
+        { label: t('company.howItWorks'), href: '/#how-it-works' },
+        { label: t('company.safety'), href: '#' },
+        { label: t('company.careers'), href: '#' },
+        { label: t('company.press'), href: '#' },
+        { label: t('company.blog'), href: '#' },
       ],
     },
     {
       title: t('supportTitle'),
       links: [
-        t('support.helpCenter'), t('support.contactUs'), t('support.privacy'),
-        t('support.terms'), t('support.cookies'),
+        { label: t('support.helpCenter'), href: '#' },
+        { label: t('support.contactUs'), href: '/contact-us' },
+        { label: t('support.privacy'), href: '#' },
+        { label: t('support.terms'), href: '#' },
+        { label: t('support.cookies'), href: '#' },
       ],
     },
   ]
@@ -66,14 +76,14 @@ export default function Footer() {
               <Stack spacing={1}>
                 {col.links.map((link) => (
                   <MuiLink
-                    key={link}
+                    key={link.label}
                     component={Link}
-                    href="#"
+                    href={link.href}
                     underline="none"
                     variant="body2"
                     sx={{ color: 'grey.500', '&:hover': { color: '#FF6B9D' } }}
                   >
-                    {link}
+                    {link.label}
                   </MuiLink>
                 ))}
               </Stack>

@@ -1,0 +1,32 @@
+{
+  "heroChip": "About Carethia",
+  "heroTitle": "Our Story, Mission, and Vision",
+  "heroSubtitle": "We are building a trusted, family-centered platform for special-needs care in Thailand.",
+  "storyTitle": "Our Story",
+  "storyP1": "Carethia was founded by a family member who experienced firsthand the challenges of finding reliable care for a loved one with an intellectual disability. What began as a deeply personal struggle grew into a shared mission to support families and caregivers facing the same reality every day.",
+  "storyP2": "From that experience, we saw a bigger gap: families were navigating scattered referrals, unclear credentials, and inconsistent information, while many qualified caregivers had limited visibility to the families who needed them most.",
+  "storyP3": "Carethia was created as a trust-focused solution that helps families discover, evaluate, and book verified special-needs caregivers based on real needs, experience, and compatibility.",
+  "whatWeDoTitle": "What We Do",
+  "whatWeDoBody": "We connect families with verified special-needs caregivers through a simple, confidence-first experience. Families can compare profiles, evaluate fit, and book with transparency and peace of mind.",
+  "inspirationChip": "Our Inspiration",
+  "inspirationTitle": "Inspired by Families, Built for Families",
+  "inspirationBody": "Behind every booking is a real family seeking stability, dignity, and dependable support. This mission drives every feature we build and every caregiver partnership we grow.",
+  "inspirationQuote": "When care is easier to find, families can focus on growth, connection, and everyday joy.",
+  "trustTitle": "Why Families Trust Carethia",
+  "trustPoints": [
+    "Verified caregiver profiles with relevant special-needs experience",
+    "Transparent reviews and clear service details",
+    "Reliable booking flow with upfront pricing and no hidden surprises",
+    "Ongoing support designed for long-term care, not one-time matching"
+  ],
+  "caregiverSupportTitle": "How We Support Caregivers",
+  "caregiverSupportPoints": [
+    "Better visibility to families actively seeking care",
+    "A professional space to present skills and build trust",
+    "More stable booking opportunities and repeat relationships",
+    "A platform that values caregiving as meaningful, skilled work"
+  ],
+  "visionTitle": "Our Vision",
+  "visionBody": "Carethia is building a more accessible and dependable care ecosystem where families feel confident, caregivers feel respected, and quality special-needs care becomes easier to find, sustain, and grow over time.",
+  "backHome": "Back to Home"
+}

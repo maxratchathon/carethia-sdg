@@ -14,7 +14,7 @@ import CaregiverCard from '@/components/CaregiverCard'
 import { mockCaregivers, SERVICE_ICONS, SERVICE_LABELS } from '@/lib/mockData'
 import type { ServiceType } from '@/lib/mockData'
 
-const ALL_SERVICES: ServiceType[] = ['SPECIAL_NEEDS_TRAINER']
+const ALL_SERVICES: ServiceType[] = ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION']
 const ALL_CITIES = ['Bangkok', 'Chiang Mai', 'Phuket', 'Pattaya']
 
 function CaregiversContent() {

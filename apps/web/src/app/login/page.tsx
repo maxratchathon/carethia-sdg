@@ -2,17 +2,18 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import {
   Box, Container, Typography, Button, TextField, Paper,
   Divider, Stack, Alert, CircularProgress, InputAdornment, IconButton,
 } from '@mui/material'
-import FavoriteIcon from '@mui/icons-material/Favorite'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import { useAuth } from '@/lib/auth-context'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { t } = useTranslation('auth')
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,13 +33,13 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Login failed. Please try again.')
+        setError(data.error || t('login.errors.loginFailed'))
         return
       }
       login(data.user)
       router.push('/dashboard')
     } catch {
-      setError('Network error. Please try again.')
+      setError(t('login.errors.network'))
     } finally {
       setLoading(false)
     }
@@ -56,14 +57,19 @@ export default function LoginPage() {
         {/* Logo */}
         <Box textAlign="center" mb={4}>
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <FavoriteIcon sx={{ color: '#FF6B9D', fontSize: 32 }} />
+            <Box
+              component="img"
+              src="/locales/images/carethia_logo.png"
+              alt="Carethia logo"
+              sx={{ width: 32, height: 32, objectFit: 'contain' }}
+            />
             <Typography variant="h5" fontWeight={800} color="#FF6B9D">Carethia</Typography>
           </Link>
         </Box>
 
         <Paper elevation={0} sx={{ borderRadius: 4, p: { xs: 3, sm: 4 }, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 4px 30px rgba(0,0,0,0.08)' }}>
-          <Typography variant="h5" fontWeight={800} mb={0.5}>Welcome back 👋</Typography>
-          <Typography color="text.secondary" fontSize="0.9rem" mb={3}>Sign in to your Carethia account</Typography>
+          <Typography variant="h5" fontWeight={800} mb={0.5}>{t('login.welcome')} 👋</Typography>
+          <Typography color="text.secondary" fontSize="0.9rem" mb={3}>{t('login.subtitle')}</Typography>
 
           {error && (
             <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>{error}</Alert>
@@ -72,12 +78,12 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit}>
             <Stack spacing={2.5}>
               <TextField
-                fullWidth label="Email address" type="email"
+                fullWidth label={t('login.email')} type="email"
                 value={email} onChange={(e) => setEmail(e.target.value)} required
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
               />
               <TextField
-                fullWidth label="Password"
+                fullWidth label={t('login.password')}
                 type={showPassword ? 'text' : 'password'}
                 value={password} onChange={(e) => setPassword(e.target.value)} required
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
@@ -95,13 +101,13 @@ export default function LoginPage() {
                 type="submit" variant="contained" fullWidth size="large" disabled={loading}
                 sx={{ background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', borderRadius: 3, py: 1.5, fontWeight: 700, fontSize: '1rem' }}
               >
-                {loading ? <CircularProgress size={22} color="inherit" /> : 'Sign In'}
+                {loading ? <CircularProgress size={22} color="inherit" /> : t('login.signIn')}
               </Button>
             </Stack>
           </form>
 
           <Divider sx={{ my: 3 }}>
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>TRY A DEMO ACCOUNT</Typography>
+            <Typography variant="caption" color="text.secondary" fontWeight={600}>{t('login.demoTitle')}</Typography>
           </Divider>
 
           <Stack spacing={1.5}>
@@ -111,7 +117,7 @@ export default function LoginPage() {
             >
               <Box mr={1.5} fontSize={18}>👩‍👧</Box>
               <Box textAlign="left">
-                <Typography fontSize={13} fontWeight={700}>Customer Demo</Typography>
+                <Typography fontSize={13} fontWeight={700}>{t('login.customerDemo')}</Typography>
                 <Typography variant="caption" color="text.secondary">siriporn@example.com</Typography>
               </Box>
             </Button>
@@ -121,7 +127,7 @@ export default function LoginPage() {
             >
               <Box mr={1.5} fontSize={18}>🛡️</Box>
               <Box textAlign="left">
-                <Typography fontSize={13} fontWeight={700}>Caregiver Demo</Typography>
+                <Typography fontSize={13} fontWeight={700}>{t('login.caregiverDemo')}</Typography>
                 <Typography variant="caption" color="text.secondary">nida@example.com</Typography>
               </Box>
             </Button>
@@ -129,9 +135,9 @@ export default function LoginPage() {
 
           <Box mt={3} textAlign="center">
             <Typography variant="body2" color="text.secondary">
-              Don&apos;t have an account?{' '}
+              {t('login.noAccount')}{' '}
               <Link href="/register" style={{ color: '#FF6B9D', fontWeight: 700, textDecoration: 'none' }}>
-                Sign up free
+                {t('login.signUp')}
               </Link>
             </Typography>
           </Box>
