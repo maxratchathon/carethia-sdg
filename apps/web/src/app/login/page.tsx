@@ -45,9 +45,10 @@ export default function LoginPage() {
     }
   }
 
-  const fillDemo = (type: 'customer' | 'caregiver') => {
-    setEmail(type === 'customer' ? 'siriporn@example.com' : 'nida@example.com')
-    setPassword('demo1234')
+  const fillDemo = (type: 'customer' | 'thai-caregiver' | 'foreign-caregiver') => {
+    if (type === 'customer') { setEmail('siriporn@example.com'); setPassword('demo1234') }
+    if (type === 'thai-caregiver') { setEmail('nipa.demo@carethia.com'); setPassword('demo1234') }
+    if (type === 'foreign-caregiver') { setEmail('aye.demo@carethia.com'); setPassword('demo1234') }
     setError('')
   }
 
@@ -122,13 +123,23 @@ export default function LoginPage() {
               </Box>
             </Button>
             <Button
-              fullWidth variant="outlined" onClick={() => fillDemo('caregiver')}
+              fullWidth variant="outlined" onClick={() => fillDemo('thai-caregiver')}
               sx={{ borderRadius: 3, borderColor: '#2ECC71', color: '#2ECC71', fontWeight: 600, justifyContent: 'flex-start', px: 2 }}
             >
-              <Box mr={1.5} fontSize={18}>🛡️</Box>
+              <Box mr={1.5} fontSize={18}>🇹🇭</Box>
               <Box textAlign="left">
-                <Typography fontSize={13} fontWeight={700}>{t('login.caregiverDemo')}</Typography>
-                <Typography variant="caption" color="text.secondary">nida@example.com</Typography>
+                <Typography fontSize={13} fontWeight={700}>Thai Caregiver — Sook-Jai Score</Typography>
+                <Typography variant="caption" color="text.secondary">Nipa · nipa.demo@carethia.com</Typography>
+              </Box>
+            </Button>
+            <Button
+              fullWidth variant="outlined" onClick={() => fillDemo('foreign-caregiver')}
+              sx={{ borderRadius: 3, borderColor: '#6C5CE7', color: '#6C5CE7', fontWeight: 600, justifyContent: 'flex-start', px: 2 }}
+            >
+              <Box mr={1.5} fontSize={18}>🇲🇲</Box>
+              <Box textAlign="left">
+                <Typography fontSize={13} fontWeight={700}>Foreigner Caregiver — CAS Score</Typography>
+                <Typography variant="caption" color="text.secondary">Aye · aye.demo@carethia.com</Typography>
               </Box>
             </Button>
           </Stack>

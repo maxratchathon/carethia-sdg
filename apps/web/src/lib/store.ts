@@ -1,6 +1,160 @@
 // In-memory array database — perfect for hackathon MVP
 // Data persists for the lifetime of the Next.js server process
 
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+export enum UserRole {
+    Customer  = 'CUSTOMER',
+    Caregiver = 'CAREGIVER',
+    Admin     = 'ADMIN',
+}
+
+export enum CaregiverType {
+    Thai      = 'THAI',
+    Foreigner = 'FOREIGNER',
+}
+
+export enum BookingStatus {
+    Pending   = 'PENDING',
+    Confirmed = 'CONFIRMED',
+    Completed = 'COMPLETED',
+    Cancelled = 'CANCELLED',
+}
+
+export enum ApplicationStatus {
+    Pending  = 'PENDING',
+    Approved = 'APPROVED',
+    Rejected = 'REJECTED',
+}
+
+// ── Thai Caregiver ────────────────────────────────────────────────────────────
+
+export enum ThaiDialect {
+    Central    = 'Central (Standard Thai)',
+    Isan       = 'Isan',
+    Northern   = 'Northern (Kam Mueang)',
+    Southern   = 'Southern (Pak Tai)',
+    Yawi       = 'Yawi',
+    TeochewHokkien = 'Teochew/Hokkien',
+}
+
+export enum SecondaryLanguage {
+    English  = 'English',
+    Mandarin = 'Mandarin',
+    Japanese = 'Japanese',
+    Korean   = 'Korean',
+    German   = 'German',
+    French   = 'French',
+    Arabic   = 'Arabic',
+    Burmese  = 'Burmese',
+    Khmer    = 'Khmer',
+    Vietnamese = 'Vietnamese',
+}
+
+export enum CommunicationStyle {
+    JaJaa     = 'ja-jaa',
+    KhuaySanuk = 'khuay-sanuk',
+    SanguanTa = 'sanguan-ta',
+    DuedDun   = 'dued-dun',
+}
+
+export enum SpiritualSkill {
+    TakBat   = 'tak_bat',
+    Chanting = 'chanting',
+    Holidays = 'holidays',
+}
+
+export enum CulinarySpecialty {
+    SoftFood  = 'soft_food',
+    LowSodium = 'low_sodium',
+    NamPrik   = 'nam_prik',
+    Western   = 'western',
+}
+
+export enum EducationLevel {
+    BachelorNursing  = 'Bachelor of Nursing (RN)',
+    PracticalNurse   = 'Practical Nurse (PN)',
+    NursingAssistant = 'Nursing Assistant (NA)',
+    FirstAid         = 'First Aid Certified',
+    LifeExperience   = 'Life-Experience (Informal)',
+}
+
+export enum ClinicalSkill {
+    Vitals     = 'vitals',
+    Medication = 'medication',
+    Wound      = 'wound',
+    NgTube     = 'ng_tube',
+    Suction    = 'suction',
+    Oxygen     = 'oxygen',
+}
+
+export enum MobilitySupport {
+    HeavyLift     = 'heavy_lift',
+    AssistedWalk  = 'assisted_walk',
+    Bedridden     = 'bedridden',
+}
+
+export enum ConditionExperience {
+    Dementia   = 'dementia',
+    Stroke     = 'stroke',
+    Diabetes   = 'diabetes',
+    Palliative = 'palliative',
+}
+
+// ── Foreign Caregiver ─────────────────────────────────────────────────────────
+
+export enum StorytellingLevel {
+    Basic        = 'Basic — Simple conversation only',
+    Intermediate = 'Intermediate — Can retell familiar stories',
+    Advanced     = "Advanced — Can translate children's books & folk tales",
+    Expert       = 'Expert — Rich proverbial / literary usage',
+}
+
+export enum MusicalHeritage {
+    Lullabies  = 'lullabies',
+    Nursery    = 'nursery',
+    FolkSongs  = 'folk_songs',
+}
+
+export enum VocabBreadth {
+    Basic        = 'Basic communication',
+    Intermediate = 'Intermediate',
+    Advanced     = 'Advanced / Literary / Proverbial usage',
+}
+
+export enum CalendarAwareness {
+    LunarNewYear = 'lunar_new_year',
+    Harvest      = 'harvest',
+    Religious    = 'religious',
+    OtherEthnic  = 'other_ethnic',
+}
+
+export enum CulturalActivity {
+    Games      = 'games',
+    Crafts     = 'crafts',
+    Dance      = 'dance',
+    Instrument = 'instrument',
+}
+
+export enum ArtifactUsage {
+    Yes = 'yes',
+    No  = 'no',
+}
+
+export enum CommunityInvolvement {
+    Active     = 'active',
+    Occasional = 'occasional',
+    None       = 'none',
+}
+
+export enum TraditionalAttire {
+    Own       = 'own',
+    Willing   = 'willing',
+    PreferNot = 'prefer_not',
+}
+
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
 export interface StoredUser {
     id: number
     email: string
@@ -8,9 +162,50 @@ export interface StoredUser {
     firstName: string
     lastName: string
     phone: string
-    role: 'CUSTOMER' | 'CAREGIVER' | 'ADMIN'
+    role: UserRole
     points: number   // loyalty points — drives Bronze/Silver/Gold tier
     createdAt: string
+
+    // Caregiver-specific fields
+    country?: string
+    caregiverType?: CaregiverType
+
+    // Thai caregiver — Cultural (65%)
+    nativeDialect?: ThaiDialect
+    secondaryLanguages?: SecondaryLanguage[]
+    hometown?: string
+    communicationStyle?: CommunicationStyle
+    spiritualSkills?: SpiritualSkill[]
+    culinarySpecialties?: CulinarySpecialty[]
+
+    // Thai caregiver — Medical (35%)
+    education?: EducationLevel
+    clinicalSkills?: ClinicalSkill[]
+    mobilitySupport?: MobilitySupport
+    conditionExperience?: ConditionExperience[]
+    yearsExperience?: number
+
+    // Foreign caregiver — Language (40%)
+    motherTongue?: string
+    dialect?: string
+    storytellingLevel?: StorytellingLevel
+    musicalHeritage?: MusicalHeritage[]
+    vocabBreadth?: VocabBreadth
+
+    // Foreign caregiver — Cultural Practice (30%)
+    ritualMastery?: string
+    ethnicDishes?: string
+    calendarAwareness?: CalendarAwareness[]
+
+    // Foreign caregiver — Child Facilitation (20%)
+    culturalActivities?: CulturalActivity[]
+    explanationAbility?: string
+    usesArtifacts?: ArtifactUsage
+
+    // Foreign caregiver — Identity Affirmation (10%)
+    communityInvolvement?: CommunityInvolvement
+    pridStatement?: string
+    traditionalAttire?: TraditionalAttire
 }
 
 export interface StoredBooking {
@@ -29,7 +224,7 @@ export interface StoredBooking {
     platformFee: number
     isEmergency: boolean
     notes: string
-    status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+    status: BookingStatus
     createdAt: string
 }
 
@@ -45,7 +240,7 @@ export interface StoredApplication {
     certifications: string
     hourlyRate: number
     city: string
-    status: 'PENDING' | 'APPROVED' | 'REJECTED'
+    status: ApplicationStatus
     createdAt: string
 }
 
@@ -96,7 +291,7 @@ const SEED_USERS: StoredUser[] = [
         firstName: 'Siriporn',
         lastName: 'Wattana',
         phone: '0812345678',
-        role: 'CUSTOMER',
+        role: UserRole.Customer,
         points: 380,
         createdAt: new Date('2026-01-01').toISOString(),
     },
@@ -107,7 +302,7 @@ const SEED_USERS: StoredUser[] = [
         firstName: 'Nida',
         lastName: 'Somchai',
         phone: '0823456789',
-        role: 'CAREGIVER',
+        role: UserRole.Caregiver,
         points: 1250,
         createdAt: new Date('2026-01-02').toISOString(),
     },
@@ -118,9 +313,68 @@ const SEED_USERS: StoredUser[] = [
         firstName: 'Admin',
         lastName: 'Carethia',
         phone: '0800000000',
-        role: 'ADMIN',
+        role: UserRole.Admin,
         points: 2500,
         createdAt: new Date('2026-01-01').toISOString(),
+    },
+    // ── Demo: Thai Caregiver (Sook-Jai Score) ─────────────────────────────────
+    {
+        id: 4,
+        email: 'nipa.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Nipa',
+        lastName: 'Saengthong',
+        phone: '0891234567',
+        role: UserRole.Caregiver,
+        points: 920,
+        createdAt: new Date('2026-01-10').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        // Cultural & Dialect Profile (65%)
+        nativeDialect: ThaiDialect.Central,
+        secondaryLanguages: [SecondaryLanguage.English, SecondaryLanguage.Japanese],
+        hometown: 'Bangkok',
+        communicationStyle: CommunicationStyle.JaJaa,
+        spiritualSkills: [SpiritualSkill.TakBat, SpiritualSkill.Chanting],
+        culinarySpecialties: [CulinarySpecialty.SoftFood, CulinarySpecialty.LowSodium],
+        // Medical & Professional Skill (35%)
+        education: EducationLevel.PracticalNurse,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Medication, ClinicalSkill.Wound],
+        mobilitySupport: MobilitySupport.AssistedWalk,
+        conditionExperience: [ConditionExperience.Dementia, ConditionExperience.Stroke],
+        yearsExperience: 8,
+    },
+    // ── Demo: Foreigner Caregiver (CAS Score) ─────────────────────────────────
+    {
+        id: 5,
+        email: 'aye.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Aye',
+        lastName: 'Myat Thu',
+        phone: '0851239876',
+        role: UserRole.Caregiver,
+        points: 1540,
+        createdAt: new Date('2026-01-15').toISOString(),
+        country: 'Myanmar',
+        caregiverType: CaregiverType.Foreigner,
+        // Native Language Fluency (40%)
+        motherTongue: 'Burmese (Bamar)',
+        dialect: 'Yangon dialect',
+        storytellingLevel: StorytellingLevel.Advanced,
+        musicalHeritage: [MusicalHeritage.Lullabies, MusicalHeritage.FolkSongs],
+        vocabBreadth: VocabBreadth.Advanced,
+        // Cultural Practice Knowledge (30%)
+        ritualMastery: 'Knowledge of Thingyan water festival; can set up merit-making offerings for Thadingyut.',
+        ethnicDishes: 'Mohinga, Laphet Thoke, Ohn No Khao Swè, Htamin Jin, Mont Lin Ma Yar',
+        calendarAwareness: [CalendarAwareness.LunarNewYear, CalendarAwareness.Harvest, CalendarAwareness.Religious],
+        // Child Cultural Facilitation (20%)
+        culturalActivities: [CulturalActivity.Games, CulturalActivity.Dance],
+        explanationAbility: 'I would compare Thingyan to a big birthday party for the whole country — we splash water to wash away bad luck and welcome a fresh start.',
+        usesArtifacts: ArtifactUsage.Yes,
+        // Cultural Identity Affirmation (10%)
+        communityInvolvement: CommunityInvolvement.Active,
+        pridStatement: 'I am most proud of our tradition of storytelling through dance — every movement in the Yama Zatdaw tells a moral lesson that children carry for life.',
+        traditionalAttire: TraditionalAttire.Own,
     },
 ]
 
@@ -142,7 +396,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: '',
-        status: 'CONFIRMED',
+        status: BookingStatus.Confirmed,
         createdAt: new Date('2026-03-01').toISOString(),
     },
     {
@@ -161,7 +415,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: 'Please bring your own cleaning supplies.',
-        status: 'PENDING',
+        status: BookingStatus.Pending,
         createdAt: new Date('2026-03-02').toISOString(),
     },
     {
@@ -180,7 +434,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: '',
-        status: 'COMPLETED',
+        status: BookingStatus.Completed,
         createdAt: new Date('2026-02-15').toISOString(),
     },
     {
@@ -199,7 +453,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: 'My son has ADHD. Please be patient.',
-        status: 'COMPLETED',
+        status: BookingStatus.Completed,
         createdAt: new Date('2026-02-05').toISOString(),
     },
     // ── Bookings FOR Caregiver Nida (caregiverId=2) ────────────────────────────
@@ -219,7 +473,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: 'Two kids, ages 3 and 5. Please bring craft supplies.',
-        status: 'PENDING',
+        status: BookingStatus.Pending,
         createdAt: new Date('2026-03-06').toISOString(),
     },
     {
@@ -238,7 +492,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: 'Infant care — baby is 8 months.',
-        status: 'PENDING',
+        status: BookingStatus.Pending,
         createdAt: new Date('2026-03-06').toISOString(),
     },
     {
@@ -257,7 +511,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: '',
-        status: 'CONFIRMED',
+        status: BookingStatus.Confirmed,
         createdAt: new Date('2026-03-04').toISOString(),
     },
     {
@@ -276,7 +530,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: true,
         notes: 'Emergency booking — husband hospitalized.',
-        status: 'CONFIRMED',
+        status: BookingStatus.Confirmed,
         createdAt: new Date('2026-03-07').toISOString(),
     },
     {
@@ -295,7 +549,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: '',
-        status: 'COMPLETED',
+        status: BookingStatus.Completed,
         createdAt: new Date('2026-02-20').toISOString(),
     },
     {
@@ -314,7 +568,7 @@ const SEED_BOOKINGS: StoredBooking[] = [
         platformFee: 120,
         isEmergency: false,
         notes: '',
-        status: 'COMPLETED',
+        status: BookingStatus.Completed,
         createdAt: new Date('2026-02-14').toISOString(),
     },
 ]
@@ -403,7 +657,7 @@ export function updateBookingStatus(
     if (!booking) return null
     booking.status = status
     // Award loyalty points on completion
-    if (status === 'COMPLETED') {
+    if (status === BookingStatus.Completed) {
         addPoints(booking.customerId, 50)   // customer earns 50 pts per completed booking
         addPoints(booking.caregiverId, 100) // caregiver earns 100 pts per completed session
     }
@@ -468,8 +722,15 @@ export function updateCaregiverProfile(
 
 // ─── Relationship Score ───────────────────────────────────────────────────────
 
+export enum RelationshipLevel {
+    New      = 'New',
+    Familiar = 'Familiar',
+    Regular  = 'Regular',
+    Trusted  = 'Trusted',
+}
+
 export interface RelationshipScore {
-    level: 'New' | 'Familiar' | 'Regular' | 'Trusted'
+    level: RelationshipLevel
     bookingCount: number
     score: number   // 0–100
     color: string
@@ -479,13 +740,13 @@ export interface RelationshipScore {
 /** How well a customer knows a caregiver, based on completed bookings together. */
 export function getRelationshipScore(customerId: number, caregiverId: number): RelationshipScore {
     const count = getStore().bookings.filter(
-        b => b.customerId === customerId && b.caregiverId === caregiverId && b.status === 'COMPLETED',
+        b => b.customerId === customerId && b.caregiverId === caregiverId && b.status === BookingStatus.Completed,
     ).length
     const score = Math.min(100, count * 20 + (count > 0 ? 10 : 0))
-    if (count === 0) return { level: 'New', bookingCount: 0, score: 0, color: '#9E9E9E', icon: '👋' }
-    if (count <= 2) return { level: 'Familiar', bookingCount: count, score, color: '#FF8C00', icon: '🤝' }
-    if (count <= 5) return { level: 'Regular', bookingCount: count, score, color: '#6C63FF', icon: '💜' }
-    return { level: 'Trusted', bookingCount: count, score: 100, color: '#2ECC71', icon: '⭐' }
+    if (count === 0) return { level: RelationshipLevel.New,      bookingCount: 0,     score: 0,   color: '#9E9E9E', icon: '👋' }
+    if (count <= 2)  return { level: RelationshipLevel.Familiar, bookingCount: count, score,      color: '#FF8C00', icon: '🤝' }
+    if (count <= 5)  return { level: RelationshipLevel.Regular,  bookingCount: count, score,      color: '#6C63FF', icon: '💜' }
+    return             { level: RelationshipLevel.Trusted,  bookingCount: count, score: 100, color: '#2ECC71', icon: '⭐' }
 }
 
 
