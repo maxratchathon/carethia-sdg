@@ -386,7 +386,7 @@ function RegisterForm() {
                 </Select>
               </FormControl>
 
-              {country && (
+              {/* {country && (
                 <Box sx={{
                   p: 2.5, borderRadius: 3,
                   bgcolor: country === 'Thailand' ? '#F0FFF4' : '#F3F2FF',
@@ -411,7 +411,7 @@ function RegisterForm() {
                     </>
                   )}
                 </Box>
-              )}
+              )} */}
             </Box>
           )}
 
