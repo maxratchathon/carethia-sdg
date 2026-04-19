@@ -1,3 +1,4 @@
+'use client'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
@@ -52,4 +53,6 @@ if (!i18n.isInitialized) {
     })
 }
 
-export default i18n
+// Named export avoids Next.js App Router's "Cannot access default.then on the server" error.
+// The RSC module proxy only intercepts `.default.then`; named exports are not affected.
+export { i18n }

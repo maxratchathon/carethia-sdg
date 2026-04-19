@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
-import i18n from '@/lib/i18n'
+import { i18n } from '@/lib/i18n'
 import {
   AppBar, Toolbar, Box, Button, Container, IconButton,
   Drawer, List, ListItem, ListItemButton, ListItemText,
