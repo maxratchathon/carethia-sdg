@@ -173,7 +173,13 @@ function CaregiversContent() {
 
               <Typography fontWeight={600} fontSize={13} mb={1.5} color="text.secondary" letterSpacing={0.5}>LANGUAGE</Typography>
               <Stack spacing={1} mb={3}>
-                {([['ALL', '🌐 All Languages'], ['Thai', '🇹🇭 Thai dialects'], ['English', '🇬🇧 English'], ['Myanmar', '🇲🇲 Myanmar'], ['Khmer', '🇰🇭 Khmer'], ['Filipino', '🇵🇭 Filipino']] as const).map(([val, label]) => (
+                <Chip label="🌐 All Languages" onClick={() => setLanguage('ALL')} variant={language === 'ALL' ? 'filled' : 'outlined'} sx={{ justifyContent: 'flex-start', borderColor: language === 'ALL' ? '#FF6B9D' : undefined, bgcolor: language === 'ALL' ? '#FFF0F5' : undefined, color: language === 'ALL' ? '#FF6B9D' : undefined, fontWeight: language === 'ALL' ? 700 : 400 }} />
+                <Typography fontSize={11} fontWeight={600} color="text.secondary" sx={{ pt: 0.5, pb: 0, letterSpacing: 0.4 }}>🇹🇭 Thai dialects</Typography>
+                {([['Central Thai', 'Central Thai'], ['Isan (Thai-Lao)', 'Isan (Thai-Lao)'], ['Northern Thai (Lanna)', 'Northern Thai (Lanna)'], ['Southern Thai', 'Southern Thai']] as const).map(([val, label]) => (
+                  <Chip key={val} label={label} onClick={() => setLanguage(val)} variant={language === val ? 'filled' : 'outlined'} sx={{ justifyContent: 'flex-start', ml: 1, borderColor: language === val ? '#FF6B9D' : undefined, bgcolor: language === val ? '#FFF0F5' : undefined, color: language === val ? '#FF6B9D' : undefined, fontWeight: language === val ? 700 : 400 }} />
+                ))}
+                <Typography fontSize={11} fontWeight={600} color="text.secondary" sx={{ pt: 0.5, pb: 0, letterSpacing: 0.4 }}>🌐 Other Languages</Typography>
+                {([['English', '🇬🇧 English'], ['Myanmar', '🇲🇲 Myanmar'], ['Khmer', '🇰🇭 Khmer'], ['Filipino', '🇵🇭 Filipino']] as const).map(([val, label]) => (
                   <Chip key={val} label={label} onClick={() => setLanguage(val)} variant={language === val ? 'filled' : 'outlined'} sx={{ justifyContent: 'flex-start', borderColor: language === val ? '#FF6B9D' : undefined, bgcolor: language === val ? '#FFF0F5' : undefined, color: language === val ? '#FF6B9D' : undefined, fontWeight: language === val ? 700 : 400 }} />
                 ))}
               </Stack>
