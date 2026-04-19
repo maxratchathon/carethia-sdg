@@ -15,12 +15,16 @@ import { getTier } from '@/lib/store'
 interface CaregiverCardProps {
   caregiver: MockCaregiver
   showServiceChip?: boolean
+  requestId?: number | null
 }
 
-export default function CaregiverCard({ caregiver, showServiceChip = true }: CaregiverCardProps) {
+export default function CaregiverCard({ caregiver, showServiceChip = true, requestId = null }: CaregiverCardProps) {
   const mainService = caregiver.service
   const serviceColor = SERVICE_COLORS[mainService]
   const tier = getTier(caregiver.points ?? 0)
+  const caregiverHref = requestId
+    ? `/caregivers/${caregiver.id}?requestId=${requestId}`
+    : `/caregivers/${caregiver.id}`
 
   return (
     <Card
@@ -38,7 +42,7 @@ export default function CaregiverCard({ caregiver, showServiceChip = true }: Car
         flexDirection: 'column',
       }}
     >
-      <CardActionArea component={Link} href={`/caregivers/${caregiver.id}`} sx={{ flexGrow: 1 }}>
+      <CardActionArea component={Link} href={caregiverHref} sx={{ flexGrow: 1 }}>
         {/* Top color band */}
         <Box sx={{ height: 8, background: `linear-gradient(135deg, ${serviceColor}, #C06C84)`, borderRadius: '16px 16px 0 0' }} />
 

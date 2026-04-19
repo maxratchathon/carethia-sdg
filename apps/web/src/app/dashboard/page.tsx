@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Box, Container, Typography, Grid, Card, CardContent,
   Avatar, Chip, Stack, Button, LinearProgress, Divider,
@@ -22,6 +23,7 @@ const STATUS_COLORS: Record<string, string> = { CONFIRMED: '#2ECC71', PENDING: '
 const STATUS_BG: Record<string, string> = { CONFIRMED: '#F0FFF7', PENDING: '#FFF8F0', COMPLETED: '#F3F2FF', CANCELLED: '#FFF0F0' }
 
 export default function Dashboard() {
+  const router = useRouter()
   const { user } = useAuth()
   const tier = getTier(user?.points ?? 0)
   const nextTier = TIER_CONFIG.find(t => (user?.points ?? 0) < t.min) ?? null
@@ -35,6 +37,11 @@ export default function Dashboard() {
   const favorites = mockCaregivers.filter((c) => c.verified).slice(0, 4)
 
   useEffect(() => {
+    if (user?.role === 'CAREGIVER') {
+      router.replace('/caregiver-portal')
+      return
+    }
+
     const fetchBookings = async () => {
       const userId = user?.id ?? 1 // fall back to demo user (Siriporn) if not logged in
       try {
@@ -50,7 +57,7 @@ export default function Dashboard() {
       }
     }
     fetchBookings()
-  }, [user])
+  }, [router, user])
 
   const upcomingBookings = bookings.filter(b => b.status === 'PENDING' || b.status === 'CONFIRMED')
   const pastBookings = bookings.filter(b => b.status === 'COMPLETED' || b.status === 'CANCELLED')
@@ -74,9 +81,30 @@ export default function Dashboard() {
                 />
               </Box>
             </Box>
-            <Button variant="contained" startIcon={<AddIcon />} component={Link} href="/caregivers" sx={{ background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', borderRadius: 3, fontWeight: 600, boxShadow: '0 4px 12px rgba(255,107,157,0.35)' }}>
-              New Booking
-            </Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
+              <Button
+                variant="contained"
+                component={Link}
+                href="/caregivers"
+                sx={{
+                  background: 'linear-gradient(135deg, #FF6B9D, #C06C84)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  boxShadow: '0 4px 12px rgba(255,107,157,0.35)',
+                }}
+              >
+                Find Caregiver
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                component={Link}
+                href="/family/requests/new"
+                sx={{ borderRadius: 3, fontWeight: 600, borderColor: '#6C63FF', color: '#6C63FF' }}
+              >
+                New Care Request
+              </Button>
+            </Stack>
           </Box>
         </Container>
       </Box>

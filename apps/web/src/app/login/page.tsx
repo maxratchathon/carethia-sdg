@@ -45,10 +45,21 @@ export default function LoginPage() {
     }
   }
 
-  const fillDemo = (type: 'customer' | 'thai-caregiver' | 'foreign-caregiver') => {
+  const fillDemo = (
+    type:
+      | 'customer'
+      | 'thai-caregiver'
+      | 'foreign-caregiver'
+      | 'thai-caregiver-2'
+      | 'foreign-caregiver-2'
+      | 'thai-caregiver-3'
+  ) => {
     if (type === 'customer') { setEmail('siriporn@example.com'); setPassword('demo1234') }
     if (type === 'thai-caregiver') { setEmail('nipa.demo@carethia.com'); setPassword('demo1234') }
     if (type === 'foreign-caregiver') { setEmail('aye.demo@carethia.com'); setPassword('demo1234') }
+    if (type === 'thai-caregiver-2') { setEmail('malee.demo@carethia.com'); setPassword('demo1234') }
+    if (type === 'foreign-caregiver-2') { setEmail('maria.demo@carethia.com'); setPassword('demo1234') }
+    if (type === 'thai-caregiver-3') { setEmail('kanok.demo@carethia.com'); setPassword('demo1234') }
     setError('')
   }
 
@@ -140,6 +151,36 @@ export default function LoginPage() {
               <Box textAlign="left">
                 <Typography fontSize={13} fontWeight={700}>Foreigner Caregiver — CAS Score</Typography>
                 <Typography variant="caption" color="text.secondary">Aye · aye.demo@carethia.com</Typography>
+              </Box>
+            </Button>
+            <Button
+              fullWidth variant="outlined" onClick={() => fillDemo('thai-caregiver-2')}
+              sx={{ borderRadius: 3, borderColor: '#2ECC71', color: '#2ECC71', fontWeight: 600, justifyContent: 'flex-start', px: 2 }}
+            >
+              <Box mr={1.5} fontSize={18}>🇹🇭</Box>
+              <Box textAlign="left">
+                <Typography fontSize={13} fontWeight={700}>Thai Caregiver — Companion Focus</Typography>
+                <Typography variant="caption" color="text.secondary">Malee · malee.demo@carethia.com</Typography>
+              </Box>
+            </Button>
+            <Button
+              fullWidth variant="outlined" onClick={() => fillDemo('foreign-caregiver-2')}
+              sx={{ borderRadius: 3, borderColor: '#6C5CE7', color: '#6C5CE7', fontWeight: 600, justifyContent: 'flex-start', px: 2 }}
+            >
+              <Box mr={1.5} fontSize={18}>🇵🇭</Box>
+              <Box textAlign="left">
+                <Typography fontSize={13} fontWeight={700}>Foreigner Caregiver — Bilingual Support</Typography>
+                <Typography variant="caption" color="text.secondary">Maria · maria.demo@carethia.com</Typography>
+              </Box>
+            </Button>
+            <Button
+              fullWidth variant="outlined" onClick={() => fillDemo('thai-caregiver-3')}
+              sx={{ borderRadius: 3, borderColor: '#2ECC71', color: '#2ECC71', fontWeight: 600, justifyContent: 'flex-start', px: 2 }}
+            >
+              <Box mr={1.5} fontSize={18}>🇹🇭</Box>
+              <Box textAlign="left">
+                <Typography fontSize={13} fontWeight={700}>Thai Caregiver — High Acuity</Typography>
+                <Typography variant="caption" color="text.secondary">Kanok · kanok.demo@carethia.com</Typography>
               </Box>
             </Button>
           </Stack>

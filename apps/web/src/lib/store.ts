@@ -118,6 +118,7 @@ export interface StoredCaregiverProfile {
     firstName: string
     lastName: string
     email: string
+    avatar?: string
     services: string[]
     primaryService: string  // services[0]
     bio: string
@@ -125,8 +126,58 @@ export interface StoredCaregiverProfile {
     hourlyRate: number
     city: string
     certifications: string  // raw comma-separated string from form
+    languages?: string[]
+    specialties?: string[]
+    shift?: 'DAY' | 'NIGHT' | 'BOTH'
+    rating?: number
+    reviewCount?: number
     isAvailable: boolean
     createdAt: string
+}
+
+export type SpecialNeedsServiceType =
+    | 'SPECIAL_NEEDS_TRAINER'
+    | 'DAILY_LIVING_COMPANION'
+
+export type FamilyContextType = 'THAI_LOCAL' | 'MIGRANT_HERITAGE' | 'MIXED'
+
+export type CareRequestStatus = 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'FULFILLED' | 'CANCELLED'
+
+export interface StoredCareRequest {
+    id: number
+    customerId: number
+    serviceType: SpecialNeedsServiceType
+    status: CareRequestStatus
+    title: string
+    startDate: string
+    locationCity: string
+    budgetMin: number
+    budgetMax: number
+    schedule: Array<'DAY' | 'NIGHT' | 'BOTH'>
+    mustHaveLanguages: string[]
+    mustHaveSkills: string[]
+    niceToHaveSkills: string[]
+    familyContext: FamilyContextType
+    dialectImportance: number
+    regionalImportance: number
+    culturalPriority: 'LOW' | 'MEDIUM' | 'HIGH'
+    culturalRequirements: string[]
+    matchWeightRequirement: number
+    matchWeightService: number
+    matchWeightCultural: number
+    requirementsText?: string
+    familyStoryText?: string
+    childAgeBand?: string
+    childGoals?: string[]
+    childConditions?: string[]
+    childSessionStyle?: 'STRUCTURED' | 'PLAY_BASED' | 'MIXED'
+    recipientAgeBand?: string
+    mobilityLevel?: 'LOW' | 'MODERATE' | 'HIGH'
+    dailyTaskPriorities?: string[]
+    complexityLevel?: 'LOW' | 'MODERATE' | 'HIGH'
+    interactionStyle?: 'CALM' | 'ENGAGING' | 'FORMAL'
+    createdAt: string
+    updatedAt: string
 }
 
 export const TIER_CONFIG = [
@@ -146,9 +197,11 @@ interface StoreData {
     bookings: StoredBooking[]
     applications: StoredApplication[]
     caregiverProfiles: StoredCaregiverProfile[]
+    careRequests: StoredCareRequest[]
     _nextUserId: number
     _nextBookingId: number
     _nextAppId: number
+    _nextRequestId: number
 }
 
 // Seeded demo data
@@ -188,7 +241,7 @@ const SEED_USERS: StoredUser[] = [
     },
     // ── Demo: Thai Caregiver (Sook-Jai Score) ─────────────────────────────────
     {
-        id: 4,
+        id: 104,
         email: 'nipa.demo@carethia.com',
         password: 'demo1234',
         firstName: 'Nipa',
@@ -215,7 +268,7 @@ const SEED_USERS: StoredUser[] = [
     },
     // ── Demo: Foreigner Caregiver (CAS Score) ─────────────────────────────────
     {
-        id: 5,
+        id: 105,
         email: 'aye.demo@carethia.com',
         password: 'demo1234',
         firstName: 'Aye',
@@ -244,6 +297,428 @@ const SEED_USERS: StoredUser[] = [
         communityInvolvement: CommunityInvolvement.Active,
         pridStatement: 'I am most proud of our tradition of storytelling through dance — every movement in the Yama Zatdaw tells a moral lesson that children carry for life.',
         traditionalAttire: TraditionalAttire.Own,
+    },
+    // ── Demo: Thai Caregiver (Child development focus) ───────────────────────
+    {
+        id: 106,
+        email: 'malee.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Malee',
+        lastName: 'Thanakit',
+        phone: '0841122334',
+        role: UserRole.Caregiver,
+        points: 810,
+        createdAt: new Date('2026-01-18').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        nativeDialect: ThaiDialect.Northern,
+        secondaryLanguages: [SecondaryLanguage.English],
+        hometown: 'Chiang Mai',
+        communicationStyle: CommunicationStyle.KhuaySanuk,
+        spiritualSkills: [SpiritualSkill.Holidays],
+        culinarySpecialties: [CulinarySpecialty.SoftFood, CulinarySpecialty.NamPrik],
+        education: EducationLevel.NursingAssistant,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Medication],
+        mobilitySupport: MobilitySupport.AssistedWalk,
+        conditionExperience: [ConditionExperience.Stroke, ConditionExperience.Diabetes],
+        yearsExperience: 6,
+    },
+    // ── Demo: Foreigner Caregiver (Bilingual family focus) ───────────────────
+    {
+        id: 107,
+        email: 'maria.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Maria',
+        lastName: 'Santos',
+        phone: '0867788990',
+        role: UserRole.Caregiver,
+        points: 990,
+        createdAt: new Date('2026-01-20').toISOString(),
+        country: 'Philippines',
+        caregiverType: CaregiverType.Foreigner,
+        motherTongue: 'Tagalog',
+        dialect: 'Cebuano',
+        storytellingLevel: StorytellingLevel.Advanced,
+        musicalHeritage: [MusicalHeritage.Lullabies, MusicalHeritage.Nursery],
+        vocabBreadth: VocabBreadth.Advanced,
+        ritualMastery: 'Knowledge of Simbang Gabi, Flores de Mayo, and family prayer traditions.',
+        ethnicDishes: 'Arroz caldo, adobo, sinigang, champorado',
+        calendarAwareness: [CalendarAwareness.Religious, CalendarAwareness.OtherEthnic],
+        culturalActivities: [CulturalActivity.Games, CulturalActivity.Crafts],
+        explanationAbility: 'I use songs and story cards to connect culture to daily routines for young children.',
+        usesArtifacts: ArtifactUsage.Yes,
+        communityInvolvement: CommunityInvolvement.Occasional,
+        pridStatement: 'I am proud of our caring spirit and the way we build family through food and language.',
+        traditionalAttire: TraditionalAttire.Willing,
+    },
+    // ── Demo: Thai Caregiver (High-acuity elder support) ─────────────────────
+    {
+        id: 108,
+        email: 'kanok.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Kanok',
+        lastName: 'Rattanakul',
+        phone: '0835566778',
+        role: UserRole.Caregiver,
+        points: 1340,
+        createdAt: new Date('2026-01-23').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        nativeDialect: ThaiDialect.Isan,
+        secondaryLanguages: [SecondaryLanguage.English, SecondaryLanguage.Burmese],
+        hometown: 'Khon Kaen',
+        communicationStyle: CommunicationStyle.SanguanTa,
+        spiritualSkills: [SpiritualSkill.TakBat, SpiritualSkill.Chanting, SpiritualSkill.Holidays],
+        culinarySpecialties: [CulinarySpecialty.LowSodium, CulinarySpecialty.SoftFood],
+        education: EducationLevel.BachelorNursing,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Medication, ClinicalSkill.Oxygen, ClinicalSkill.Wound],
+        mobilitySupport: MobilitySupport.HeavyLift,
+        conditionExperience: [ConditionExperience.Dementia, ConditionExperience.Stroke, ConditionExperience.Palliative],
+        yearsExperience: 12,
+    },
+    // ── Demo: Thai Caregiver (Autism/ADHD child specialist) ─────────────────
+    {
+        id: 109,
+        email: 'sirilak.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Sirilak',
+        lastName: 'Jindarat',
+        phone: '0827788112',
+        role: UserRole.Caregiver,
+        points: 1180,
+        createdAt: new Date('2026-01-25').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        nativeDialect: ThaiDialect.Central,
+        secondaryLanguages: [SecondaryLanguage.English],
+        hometown: 'Bangkok',
+        communicationStyle: CommunicationStyle.KhuaySanuk,
+        spiritualSkills: [SpiritualSkill.Holidays],
+        culinarySpecialties: [CulinarySpecialty.SoftFood],
+        education: EducationLevel.BachelorNursing,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Medication],
+        mobilitySupport: MobilitySupport.AssistedWalk,
+        conditionExperience: [ConditionExperience.Dementia],
+        yearsExperience: 9,
+    },
+    // ── Demo: Foreigner Caregiver (Mandarin bilingual support) ───────────────
+    {
+        id: 110,
+        email: 'lin.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Lin',
+        lastName: 'Mei',
+        phone: '0816677331',
+        role: UserRole.Caregiver,
+        points: 860,
+        createdAt: new Date('2026-01-27').toISOString(),
+        country: 'China',
+        caregiverType: CaregiverType.Foreigner,
+        motherTongue: 'Mandarin',
+        dialect: 'Cantonese',
+        storytellingLevel: StorytellingLevel.Expert,
+        musicalHeritage: [MusicalHeritage.Nursery, MusicalHeritage.FolkSongs],
+        vocabBreadth: VocabBreadth.Advanced,
+        ritualMastery: 'Strong Lunar New Year and Mid-Autumn festival teaching for children.',
+        ethnicDishes: 'Congee, steamed fish, dumplings, red bean soup',
+        calendarAwareness: [CalendarAwareness.LunarNewYear, CalendarAwareness.OtherEthnic],
+        culturalActivities: [CulturalActivity.Crafts, CulturalActivity.Instrument],
+        explanationAbility: 'Uses visual cards and stories to explain traditions in child-friendly ways.',
+        usesArtifacts: ArtifactUsage.Yes,
+        communityInvolvement: CommunityInvolvement.Active,
+        pridStatement: 'Language and traditions help children feel rooted and confident.',
+        traditionalAttire: TraditionalAttire.Own,
+    },
+    // ── Demo: Thai Caregiver (Night shift elder companion) ───────────────────
+    {
+        id: 111,
+        email: 'orawan.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Orawan',
+        lastName: 'Saelee',
+        phone: '0863344556',
+        role: UserRole.Caregiver,
+        points: 940,
+        createdAt: new Date('2026-01-28').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        nativeDialect: ThaiDialect.Southern,
+        secondaryLanguages: [SecondaryLanguage.English],
+        hometown: 'Phuket',
+        communicationStyle: CommunicationStyle.SanguanTa,
+        spiritualSkills: [SpiritualSkill.TakBat, SpiritualSkill.Chanting],
+        culinarySpecialties: [CulinarySpecialty.LowSodium, CulinarySpecialty.SoftFood],
+        education: EducationLevel.PracticalNurse,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Medication, ClinicalSkill.Oxygen],
+        mobilitySupport: MobilitySupport.Bedridden,
+        conditionExperience: [ConditionExperience.Dementia, ConditionExperience.Palliative],
+        yearsExperience: 11,
+    },
+    // ── Demo: Thai Caregiver (Stroke rehab & mobility) ───────────────────────
+    {
+        id: 112,
+        email: 'tharinee.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Tharinee',
+        lastName: 'Kongkaew',
+        phone: '0895511229',
+        role: UserRole.Caregiver,
+        points: 1020,
+        createdAt: new Date('2026-01-29').toISOString(),
+        country: 'Thailand',
+        caregiverType: CaregiverType.Thai,
+        nativeDialect: ThaiDialect.Isan,
+        secondaryLanguages: [SecondaryLanguage.English],
+        hometown: 'Ubon Ratchathani',
+        communicationStyle: CommunicationStyle.DuedDun,
+        spiritualSkills: [SpiritualSkill.Holidays],
+        culinarySpecialties: [CulinarySpecialty.LowSodium],
+        education: EducationLevel.BachelorNursing,
+        clinicalSkills: [ClinicalSkill.Vitals, ClinicalSkill.Wound, ClinicalSkill.Medication],
+        mobilitySupport: MobilitySupport.HeavyLift,
+        conditionExperience: [ConditionExperience.Stroke, ConditionExperience.Diabetes],
+        yearsExperience: 10,
+    },
+    // ── Demo: Foreigner Caregiver (Play-based language growth) ───────────────
+    {
+        id: 113,
+        email: 'camila.demo@carethia.com',
+        password: 'demo1234',
+        firstName: 'Camila',
+        lastName: 'Reyes',
+        phone: '0839900112',
+        role: UserRole.Caregiver,
+        points: 780,
+        createdAt: new Date('2026-01-30').toISOString(),
+        country: 'Philippines',
+        caregiverType: CaregiverType.Foreigner,
+        motherTongue: 'Filipino',
+        dialect: 'Ilocano',
+        storytellingLevel: StorytellingLevel.Advanced,
+        musicalHeritage: [MusicalHeritage.Lullabies, MusicalHeritage.Nursery],
+        vocabBreadth: VocabBreadth.Intermediate,
+        ritualMastery: 'Family-centered holiday and song traditions for young children.',
+        ethnicDishes: 'Tinola, arroz caldo, pancit, bibingka',
+        calendarAwareness: [CalendarAwareness.Religious, CalendarAwareness.OtherEthnic],
+        culturalActivities: [CulturalActivity.Games, CulturalActivity.Dance],
+        explanationAbility: 'Uses play, songs, and simple examples to improve language confidence.',
+        usesArtifacts: ArtifactUsage.No,
+        communityInvolvement: CommunityInvolvement.Occasional,
+        pridStatement: 'Children should feel proud of every language they speak.',
+        traditionalAttire: TraditionalAttire.Willing,
+    },
+]
+
+const SEED_CAREGIVER_PROFILES: StoredCaregiverProfile[] = [
+    {
+        userId: 104,
+        firstName: 'Nipa',
+        lastName: 'Saengthong',
+        email: 'nipa.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=51',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'SPECIAL_NEEDS_TRAINER',
+        bio: 'Thai caregiver focused on special-needs routines, calm communication, and family coordination.',
+        experience: 8,
+        hourlyRate: 320,
+        city: 'Bangkok',
+        certifications: 'Practical Nurse (PN), vitals, medication, wound',
+        languages: ['Thai', 'English', 'Japanese'],
+        specialties: ['dementia', 'stroke', 'soft_food', 'low_sodium'],
+        shift: 'DAY',
+        rating: 4.8,
+        reviewCount: 64,
+        isAvailable: true,
+        createdAt: new Date('2026-01-10').toISOString(),
+    },
+    {
+        userId: 105,
+        firstName: 'Aye',
+        lastName: 'Myat Thu',
+        email: 'aye.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=52',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Cultural-bridge caregiver for migrant families; uses songs and traditions to support child confidence.',
+        experience: 7,
+        hourlyRate: 300,
+        city: 'Bangkok',
+        certifications: 'Advanced storytelling, cultural facilitation',
+        languages: ['Burmese (Bamar)', 'Yangon dialect', 'Thai'],
+        specialties: ['lullabies', 'folk_songs', 'games', 'dance'],
+        shift: 'BOTH',
+        rating: 4.7,
+        reviewCount: 52,
+        isAvailable: true,
+        createdAt: new Date('2026-01-15').toISOString(),
+    },
+    {
+        userId: 106,
+        firstName: 'Malee',
+        lastName: 'Thanakit',
+        email: 'malee.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=53',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Warm caregiver from Chiang Mai with child-focused routines and stroke/diabetes support experience.',
+        experience: 6,
+        hourlyRate: 280,
+        city: 'Chiang Mai',
+        certifications: 'Nursing Assistant (NA), vitals, medication',
+        languages: ['Thai', 'English'],
+        specialties: ['stroke', 'diabetes', 'soft_food', 'nam_prik'],
+        shift: 'DAY',
+        rating: 4.6,
+        reviewCount: 48,
+        isAvailable: true,
+        createdAt: new Date('2026-01-18').toISOString(),
+    },
+    {
+        userId: 107,
+        firstName: 'Maria',
+        lastName: 'Santos',
+        email: 'maria.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=54',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Bilingual caregiver helping multicultural households with language continuity and daily living support.',
+        experience: 5,
+        hourlyRate: 290,
+        city: 'Bangkok',
+        certifications: 'Advanced storytelling, child cultural activities',
+        languages: ['Tagalog', 'Cebuano', 'Thai'],
+        specialties: ['lullabies', 'nursery', 'games', 'crafts'],
+        shift: 'BOTH',
+        rating: 4.7,
+        reviewCount: 43,
+        isAvailable: true,
+        createdAt: new Date('2026-01-20').toISOString(),
+    },
+    {
+        userId: 108,
+        firstName: 'Kanok',
+        lastName: 'Rattanakul',
+        email: 'kanok.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=55',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'SPECIAL_NEEDS_TRAINER',
+        bio: 'Senior Thai caregiver for higher-acuity care plans, transfer support, and palliative companionship.',
+        experience: 12,
+        hourlyRate: 360,
+        city: 'Khon Kaen',
+        certifications: 'Bachelor of Nursing (RN), oxygen, wound care, medication',
+        languages: ['Thai', 'English', 'Burmese'],
+        specialties: ['dementia', 'stroke', 'palliative', 'low_sodium'],
+        shift: 'NIGHT',
+        rating: 4.9,
+        reviewCount: 77,
+        isAvailable: true,
+        createdAt: new Date('2026-01-23').toISOString(),
+    },
+    {
+        userId: 109,
+        firstName: 'Sirilak',
+        lastName: 'Jindarat',
+        email: 'sirilak.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=56',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'SPECIAL_NEEDS_TRAINER',
+        bio: 'Child-focused specialist for autism and ADHD routines with structured play and behavior support.',
+        experience: 9,
+        hourlyRate: 340,
+        city: 'Bangkok',
+        certifications: 'RN, behavioral support, family coaching',
+        languages: ['Thai', 'English'],
+        specialties: ['autism support', 'adhd coaching', 'structured play'],
+        shift: 'DAY',
+        rating: 4.9,
+        reviewCount: 61,
+        isAvailable: true,
+        createdAt: new Date('2026-01-25').toISOString(),
+    },
+    {
+        userId: 110,
+        firstName: 'Lin',
+        lastName: 'Mei',
+        email: 'lin.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=57',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Mandarin bilingual caregiver for multicultural homes and language continuity support.',
+        experience: 6,
+        hourlyRate: 310,
+        city: 'Bangkok',
+        certifications: 'Child language facilitation, cultural curriculum',
+        languages: ['Mandarin', 'Cantonese', 'Thai'],
+        specialties: ['bilingual care', 'storytelling', 'festival education'],
+        shift: 'BOTH',
+        rating: 4.6,
+        reviewCount: 39,
+        isAvailable: true,
+        createdAt: new Date('2026-01-27').toISOString(),
+    },
+    {
+        userId: 111,
+        firstName: 'Orawan',
+        lastName: 'Saelee',
+        email: 'orawan.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=58',
+        services: ['DAILY_LIVING_COMPANION', 'SPECIAL_NEEDS_TRAINER'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Night caregiver for elder supervision, safe transfer routines, and overnight reassurance.',
+        experience: 11,
+        hourlyRate: 350,
+        city: 'Phuket',
+        certifications: 'PN, oxygen support, palliative companionship',
+        languages: ['Thai', 'English'],
+        specialties: ['night watch', 'bedridden care', 'dementia routine'],
+        shift: 'NIGHT',
+        rating: 4.8,
+        reviewCount: 72,
+        isAvailable: true,
+        createdAt: new Date('2026-01-28').toISOString(),
+    },
+    {
+        userId: 112,
+        firstName: 'Tharinee',
+        lastName: 'Kongkaew',
+        email: 'tharinee.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=59',
+        services: ['SPECIAL_NEEDS_TRAINER', 'DAILY_LIVING_COMPANION'],
+        primaryService: 'SPECIAL_NEEDS_TRAINER',
+        bio: 'Stroke-rehab and mobility caregiver emphasizing safe transfer, exercise prompts, and consistency.',
+        experience: 10,
+        hourlyRate: 330,
+        city: 'Ubon Ratchathani',
+        certifications: 'RN, mobility support, wound care',
+        languages: ['Thai', 'English'],
+        specialties: ['stroke recovery', 'mobility assistance', 'diabetes support'],
+        shift: 'DAY',
+        rating: 4.7,
+        reviewCount: 55,
+        isAvailable: true,
+        createdAt: new Date('2026-01-29').toISOString(),
+    },
+    {
+        userId: 113,
+        firstName: 'Camila',
+        lastName: 'Reyes',
+        email: 'camila.demo@carethia.com',
+        avatar: 'https://i.pravatar.cc/150?img=60',
+        services: ['DAILY_LIVING_COMPANION', 'SPECIAL_NEEDS_TRAINER'],
+        primaryService: 'DAILY_LIVING_COMPANION',
+        bio: 'Play-based companion for language growth, confidence building, and positive routines.',
+        experience: 5,
+        hourlyRate: 285,
+        city: 'Chiang Mai',
+        certifications: 'Child activity facilitation, bilingual support',
+        languages: ['Filipino', 'Ilocano', 'Thai'],
+        specialties: ['play therapy style', 'language routines', 'social confidence'],
+        shift: 'BOTH',
+        rating: 4.5,
+        reviewCount: 34,
+        isAvailable: true,
+        createdAt: new Date('2026-01-30').toISOString(),
     },
 ]
 
@@ -442,15 +917,79 @@ const SEED_BOOKINGS: StoredBooking[] = [
     },
 ]
 
+const SEED_CARE_REQUESTS: StoredCareRequest[] = [
+    {
+        id: 1,
+        customerId: 1,
+        serviceType: 'SPECIAL_NEEDS_TRAINER',
+        status: 'ACTIVE',
+        title: 'Speech & social growth support for child',
+        startDate: '2026-04-25',
+        locationCity: 'Chiang Mai',
+        budgetMin: 250,
+        budgetMax: 450,
+        schedule: ['DAY'],
+        mustHaveLanguages: ['Thai', 'English'],
+        mustHaveSkills: ['Special-needs training', 'Progress reporting'],
+        niceToHaveSkills: ['Speech support', 'Play therapy'],
+        familyContext: 'THAI_LOCAL',
+        dialectImportance: 70,
+        regionalImportance: 60,
+        culturalPriority: 'HIGH',
+        culturalRequirements: ['Warm communication', 'Understands Thai family etiquette'],
+        matchWeightRequirement: 40,
+        matchWeightService: 35,
+        matchWeightCultural: 25,
+        childAgeBand: '6-9',
+        childGoals: ['Communication/language', 'Social interaction', 'Routine independence'],
+        childConditions: ['Speech/language delay', 'ADHD'],
+        childSessionStyle: 'MIXED',
+        createdAt: new Date('2026-04-10').toISOString(),
+        updatedAt: new Date('2026-04-15').toISOString(),
+    },
+    {
+        id: 2,
+        customerId: 1,
+        serviceType: 'DAILY_LIVING_COMPANION',
+        status: 'DRAFT',
+        title: 'Weekend companion and daily living help',
+        startDate: '2026-05-01',
+        locationCity: 'Chiang Mai',
+        budgetMin: 220,
+        budgetMax: 420,
+        schedule: ['DAY', 'NIGHT'],
+        mustHaveLanguages: ['Thai'],
+        mustHaveSkills: ['Medication reminders'],
+        niceToHaveSkills: ['Light meal prep', 'Mobility assistance'],
+        familyContext: 'MIXED',
+        dialectImportance: 40,
+        regionalImportance: 35,
+        culturalPriority: 'MEDIUM',
+        culturalRequirements: ['Calm, respectful tone'],
+        matchWeightRequirement: 40,
+        matchWeightService: 35,
+        matchWeightCultural: 25,
+        recipientAgeBand: '18-24',
+        mobilityLevel: 'MODERATE',
+        dailyTaskPriorities: ['Companionship/conversation', 'Meal support', 'Appointment escort'],
+        complexityLevel: 'MODERATE',
+        interactionStyle: 'CALM',
+        createdAt: new Date('2026-04-12').toISOString(),
+        updatedAt: new Date('2026-04-12').toISOString(),
+    },
+]
+
 function createInitialStore(): StoreData {
     return {
         users: [...SEED_USERS],
         bookings: [...SEED_BOOKINGS],
         applications: [],
-        caregiverProfiles: [],
-        _nextUserId: 100,
+        caregiverProfiles: [...SEED_CAREGIVER_PROFILES],
+        careRequests: [...SEED_CARE_REQUESTS],
+        _nextUserId: 200,
         _nextBookingId: 100,
         _nextAppId: 100,
+        _nextRequestId: 100,
     }
 }
 
@@ -609,6 +1148,56 @@ export function getRelationshipScore(customerId: number, caregiverId: number): R
     if (count <= 2)  return { level: RelationshipLevel.Familiar, bookingCount: count, score,      color: '#FF8C00', icon: '🤝' }
     if (count <= 5)  return { level: RelationshipLevel.Regular,  bookingCount: count, score,      color: '#6C63FF', icon: '💜' }
     return             { level: RelationshipLevel.Trusted,  bookingCount: count, score: 100, color: '#2ECC71', icon: '⭐' }
+}
+
+// ─── Family Care Request helpers ─────────────────────────────────────────────
+
+type NewCareRequestInput = Omit<StoredCareRequest, 'id' | 'createdAt' | 'updatedAt'>
+
+export function createCareRequest(input: NewCareRequestInput): StoredCareRequest {
+    const store = getStore()
+    const now = new Date().toISOString()
+    const request: StoredCareRequest = {
+        ...input,
+        id: store._nextRequestId++,
+        createdAt: now,
+        updatedAt: now,
+    }
+    store.careRequests.push(request)
+    return request
+}
+
+export function getCareRequestsByCustomer(customerId: number): StoredCareRequest[] {
+    return getStore()
+        .careRequests
+        .filter((request) => request.customerId === customerId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+}
+
+    export function getAllCareRequests(): StoredCareRequest[] {
+        return getStore()
+        .careRequests
+        .slice()
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    }
+
+export function getCareRequestById(id: number): StoredCareRequest | undefined {
+    return getStore().careRequests.find((request) => request.id === id)
+}
+
+export function updateCareRequest(
+    id: number,
+    patch: Partial<Omit<StoredCareRequest, 'id' | 'customerId' | 'createdAt'>>,
+): StoredCareRequest | null {
+    const store = getStore()
+    const idx = store.careRequests.findIndex((request) => request.id === id)
+    if (idx === -1) return null
+    store.careRequests[idx] = {
+        ...store.careRequests[idx],
+        ...patch,
+        updatedAt: new Date().toISOString(),
+    }
+    return store.careRequests[idx]
 }
 
 

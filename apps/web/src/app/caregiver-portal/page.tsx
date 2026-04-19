@@ -21,6 +21,17 @@ import Layout from '@/components/Layout'
 import { useAuth } from '@/lib/auth-context'
 import type { StoredBooking } from '@/lib/store'
 
+interface ActiveFamilyRequest {
+  id: number
+  title: string
+  serviceType: 'SPECIAL_NEEDS_TRAINER' | 'DAILY_LIVING_COMPANION'
+  locationCity: string
+  budgetMin: number
+  budgetMax: number
+  startDate: string
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'FULFILLED' | 'CANCELLED'
+}
+
 const STATUS_COLORS: Record<string, string> = {
   CONFIRMED: '#2ECC71', PENDING: '#FF8C00', COMPLETED: '#6C63FF', CANCELLED: '#E74C3C',
 }
@@ -46,6 +57,7 @@ export default function CaregiverPortal() {
   const caregiverId = user?.id ?? 2  // default to demo caregiver Nida
 
   const [bookings, setBookings] = useState<StoredBooking[]>([])
+  const [activeRequests, setActiveRequests] = useState<ActiveFamilyRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState(0)
   const [isAvailable, setIsAvailable] = useState(true)
@@ -66,6 +78,15 @@ export default function CaregiverPortal() {
   }, [caregiverId])
 
   useEffect(() => { fetchBookings() }, [fetchBookings])
+
+  useEffect(() => {
+    const serviceType = user?.id === 5 ? 'DAILY_LIVING_COMPANION' : 'SPECIAL_NEEDS_TRAINER'
+
+    fetch(`/api/family/requests?serviceType=${serviceType}&status=ACTIVE`)
+      .then((res) => res.json())
+      .then((data) => setActiveRequests((data.requests || []).slice(0, 4)))
+      .catch(() => setActiveRequests([]))
+  }, [user?.id])
 
   const handleStatusChange = async (booking: StoredBooking, newStatus: 'CONFIRMED' | 'CANCELLED' | 'COMPLETED') => {
     try {
@@ -390,6 +411,33 @@ export default function CaregiverPortal() {
                     </Box>
                   </Box>
                 </Stack>
+              </CardContent>
+            </Card>
+
+            {/* Matching family requests */}
+            <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', mb: 3 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Typography fontWeight={700}>Matching Family Requests</Typography>
+                  <Chip size="small" label={`${activeRequests.length} active`} sx={{ bgcolor: '#F3F2FF', color: '#6C63FF', fontWeight: 700 }} />
+                </Box>
+                {activeRequests.length === 0 ? (
+                  <Typography fontSize={13} color="text.secondary">No active requests currently match your service.</Typography>
+                ) : (
+                  <Stack spacing={1.5}>
+                    {activeRequests.map((request) => (
+                      <Box key={request.id} sx={{ p: 1.5, borderRadius: 2, border: '1px solid', borderColor: 'grey.200', bgcolor: '#FAFAFA' }}>
+                        <Typography fontSize={13} fontWeight={700}>{request.title}</Typography>
+                        <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+                          {request.locationCity} · Starts {request.startDate}
+                        </Typography>
+                        <Typography variant="caption" color="#2ECC71" fontWeight={700}>
+                          Budget ฿{request.budgetMin}-{request.budgetMax}/hr
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
               </CardContent>
             </Card>
 

@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useMemo, Suspense, useEffect } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
   Box, Container, Typography, Grid, Chip, Stack, TextField,
@@ -20,16 +21,20 @@ const ALL_CITIES = ['Bangkok', 'Chiang Mai', 'Phuket', 'Pattaya']
 function CaregiversContent() {
   const searchParams = useSearchParams()
   const initialService = (searchParams.get('service') as ServiceType) || 'ALL'
+  const requestIdParam = searchParams.get('requestId')
+  const requestId = requestIdParam ? Number(requestIdParam) : null
 
   const [search, setSearch] = useState('')
   const [service, setService] = useState<ServiceType | 'ALL'>(initialService as ServiceType | 'ALL')
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000])
   const [verifiedOnly, setVerifiedOnly] = useState(false)
-  const [availableOnly, setAvailableOnly] = useState(false)
+  const [availableOnly, setAvailableOnly] = useState(Boolean(requestId))
   const [shift, setShift] = useState<'ALL' | 'DAY' | 'NIGHT'>('ALL')
   const [city, setCity] = useState<string>('ALL')
   const [dynamicCaregivers, setDynamicCaregivers] = useState<typeof mockCaregivers>([]) 
   const [loadingProfiles, setLoadingProfiles] = useState(true)
+  const [compatibilityMap, setCompatibilityMap] = useState<Map<number, { score: number; summary: string }>>(new Map())
+  const [compatibilityLoading, setCompatibilityLoading] = useState(false)
 
   useEffect(() => {
     fetch('/api/caregivers')
@@ -41,6 +46,30 @@ function CaregiversContent() {
       .finally(() => setLoadingProfiles(false))
   }, [])
 
+  useEffect(() => {
+    if (!requestId || Number.isNaN(requestId)) {
+      setCompatibilityMap(new Map())
+      return
+    }
+
+    setCompatibilityLoading(true)
+    fetch(`/api/family/requests/${requestId}/matches`)
+      .then((r) => r.json())
+      .then((data) => {
+        const map = new Map<number, { score: number; summary: string }>()
+        const matches = Array.isArray(data?.matches) ? data.matches : []
+        matches.forEach((m: { caregiverId: number; finalMatch: number; aiRecommendationShort?: string }) => {
+          map.set(m.caregiverId, {
+            score: m.finalMatch,
+            summary: m.aiRecommendationShort || 'Good compatibility based on your request profile.',
+          })
+        })
+        setCompatibilityMap(map)
+      })
+      .catch(() => setCompatibilityMap(new Map()))
+      .finally(() => setCompatibilityLoading(false))
+  }, [requestId])
+
   // Merge mock + registered, avoid ID collisions
   const allCaregivers = useMemo(() => {
     const mockIds = new Set(mockCaregivers.map(c => c.id))
@@ -49,7 +78,7 @@ function CaregiversContent() {
   }, [dynamicCaregivers])
 
   const filtered = useMemo(() => {
-    return allCaregivers.filter((c) => {
+    const list = allCaregivers.filter((c) => {
       const q = search.toLowerCase()
       const matchSearch = !q || `${c.firstName} ${c.lastName} ${c.bio}`.toLowerCase().includes(q)
       const matchService = service === 'ALL' || c.service === service
@@ -58,22 +87,48 @@ function CaregiversContent() {
       const matchAvail = !availableOnly || c.isAvailable
       const matchShift = shift === 'ALL' || c.shift === shift || c.shift === 'BOTH'
       const matchCity = city === 'ALL' || c.city === city
-      return matchSearch && matchService && matchPrice && matchVerified && matchAvail && matchCity && matchShift && matchCity
+      return matchSearch && matchService && matchPrice && matchVerified && matchAvail && matchCity && matchShift
     })
-  }, [search, service, priceRange, verifiedOnly, availableOnly, shift, city, allCaregivers])
+
+    if (compatibilityMap.size > 0) {
+      list.sort((a, b) => (compatibilityMap.get(b.id)?.score ?? 0) - (compatibilityMap.get(a.id)?.score ?? 0))
+    }
+
+    return list
+  }, [search, service, priceRange, verifiedOnly, availableOnly, shift, city, allCaregivers, compatibilityMap])
 
   return (
     <Layout>
       {/* Header */}
       <Box sx={{ bgcolor: '#FAFAFA', borderBottom: '1px solid', borderColor: 'grey.100', py: 5 }}>
         <Container maxWidth="lg">
-          <Typography variant="h4" fontWeight={800} mb={0.5}>Find Your Perfect Caregiver</Typography>
-          <Typography color="text.secondary">
-            {allCaregivers.length} verified professionals available
-            {dynamicCaregivers.length > 0 && (
-              <Chip label={`+${dynamicCaregivers.length} new`} size="small" sx={{ ml: 1, bgcolor: '#F0FFF7', color: '#2ECC71', fontWeight: 700, fontSize: 11 }} />
-            )}
-          </Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} flexWrap="wrap">
+            <Box>
+              <Typography variant="h4" fontWeight={800} mb={0.5}>Find Your Perfect Caregiver</Typography>
+              <Typography color="text.secondary">
+                Primary booking flow: browse, compare, and book directly.
+              </Typography>
+              {requestId && (
+                <Typography color="#6C63FF" fontSize={13} fontWeight={700}>
+                  Compatibility mode is on for your Family Request #{requestId}.
+                </Typography>
+              )}
+              <Typography color="text.secondary" fontSize={13}>
+                {allCaregivers.length} verified professionals available
+                {dynamicCaregivers.length > 0 && (
+                  <Chip label={`+${dynamicCaregivers.length} new`} size="small" sx={{ ml: 1, bgcolor: '#F0FFF7', color: '#2ECC71', fontWeight: 700, fontSize: 11 }} />
+                )}
+              </Typography>
+            </Box>
+            <Button
+              component={Link}
+              href="/family/requests/new"
+              variant="outlined"
+              sx={{ borderRadius: 3, fontWeight: 700, borderColor: '#6C63FF', color: '#6C63FF' }}
+            >
+              AI Matching
+            </Button>
+          </Box>
         </Container>
       </Box>
 
@@ -146,12 +201,19 @@ function CaregiversContent() {
           {/* Results */}
           <Grid item xs={12} md={9}>
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
-              <Typography fontWeight={600}>{filtered.length} caregivers found</Typography>
+              <Typography fontWeight={600}>
+                {filtered.length} caregivers found
+                {requestId && ' · sorted by compatibility'}
+              </Typography>
               <ToggleButtonGroup size="small" exclusive>
                 <ToggleButton value="grid" sx={{ px: 2, fontSize: 12 }}>Grid</ToggleButton>
                 <ToggleButton value="list" sx={{ px: 2, fontSize: 12 }}>List</ToggleButton>
               </ToggleButtonGroup>
             </Box>
+
+            {compatibilityLoading && (
+              <Typography color="text.secondary" fontSize={13} mb={2}>Calculating compatibility...</Typography>
+            )}
 
             {filtered.length === 0 && !loadingProfiles ? (
               <Box textAlign="center" py={10}>
@@ -163,7 +225,23 @@ function CaregiversContent() {
               <Grid container spacing={3}>
                 {filtered.map((caregiver) => (
                   <Grid item xs={12} sm={6} lg={4} key={caregiver.id}>
-                    <CaregiverCard caregiver={caregiver} />
+                    <Box>
+                      {requestId && (
+                        <Stack spacing={0.6} mb={1}>
+                          <Box display="flex" justifyContent="flex-end">
+                            <Chip
+                              size="small"
+                              label={`Compatibility ${compatibilityMap.get(caregiver.id)?.score ?? 0}%`}
+                              sx={{ bgcolor: '#F0FFF7', color: '#2ECC71', fontWeight: 800 }}
+                            />
+                          </Box>
+                          <Typography fontSize={12} color="text.secondary" sx={{ px: 0.5 }}>
+                            {compatibilityMap.get(caregiver.id)?.summary ?? 'Compatibility summary not available.'}
+                          </Typography>
+                        </Stack>
+                      )}
+                      <CaregiverCard caregiver={caregiver} requestId={requestId} />
+                    </Box>
                   </Grid>
                 ))}
                 {loadingProfiles && [1,2,3].map(i => (

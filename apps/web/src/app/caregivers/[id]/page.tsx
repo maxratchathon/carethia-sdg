@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Box, Container, Typography, Grid, Avatar, Chip, Button,
   Stack, Card, CardContent, Rating, Divider, TextField,
@@ -25,14 +25,33 @@ interface Props {
   params: { id: string }
 }
 
+interface CompatibilityDetail {
+  caregiverId: number
+  finalMatch: number
+  requirementFit: number
+  serviceFit: number
+  culturalFit: number
+  confidence: number
+  reasons: string[]
+  potentialGap: string
+  aiRecommendationDetailed?: string[]
+}
+
 const PLATFORM_FEE_RATE = 0.15
 const TAX_RATE = 0.07
 const PROCESSING_FEE = 39
+const FAMILY_REQUEST_DRAFT_KEY = 'carethia_family_request_draft_v1'
 
 export default function CaregiverDetail({ params }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user } = useAuth()
   const numId = Number(params.id)
+  const requestIdParam = searchParams.get('requestId')
+  const requestId = requestIdParam ? Number(requestIdParam) : null
+  const backToListHref = requestId && !Number.isNaN(requestId)
+    ? `/caregivers?requestId=${requestId}`
+    : '/caregivers'
 
   // Try mock data first; if not found and ID>=100, fetch from API
   const mockMatch = mockCaregivers.find((c) => c.id === numId)
@@ -67,6 +86,7 @@ export default function CaregiverDetail({ params }: Props) {
   const [bookingRef, setBookingRef] = useState<number | null>(null)
   const [bookingError, setBookingError] = useState('')
   const [relScore, setRelScore] = useState<RelationshipScore | null>(null)
+  const [compatibilityDetail, setCompatibilityDetail] = useState<CompatibilityDetail | null>(null)
 
   const baseFare = (caregiver?.hourlyRate ?? 0) * bookingHours
   const platformFee = Math.round(baseFare * PLATFORM_FEE_RATE)
@@ -83,6 +103,22 @@ export default function CaregiverDetail({ params }: Props) {
       .then(data => { if (data.score) setRelScore(data.score) })
       .catch(() => {})
   }, [user, caregiver])
+
+  useEffect(() => {
+    if (!requestId || Number.isNaN(requestId) || !numId) {
+      setCompatibilityDetail(null)
+      return
+    }
+
+    fetch(`/api/family/requests/${requestId}/matches`)
+      .then((r) => r.json())
+      .then((data) => {
+        const matches = Array.isArray(data?.matches) ? data.matches : []
+        const detail = matches.find((m: CompatibilityDetail) => m.caregiverId === numId) || null
+        setCompatibilityDetail(detail)
+      })
+      .catch(() => setCompatibilityDetail(null))
+  }, [requestId, numId])
 
   if (fetchState === 'loading') {
     return (
@@ -109,7 +145,7 @@ export default function CaregiverDetail({ params }: Props) {
         <Container maxWidth="sm" sx={{ py: 10, textAlign: 'center' }}>
           <Typography fontSize={64}>🔍</Typography>
           <Typography variant="h5" fontWeight={700} mt={2} mb={1}>Caregiver not found</Typography>
-          <Button component={Link} href="/caregivers" startIcon={<ArrowBackIcon />} sx={{ color: '#FF6B9D' }}>Back to Caregivers</Button>
+          <Button component={Link} href={backToListHref} startIcon={<ArrowBackIcon />} sx={{ color: '#FF6B9D' }}>Back to Caregivers</Button>
         </Container>
       </Layout>
     )
@@ -156,6 +192,11 @@ export default function CaregiverDetail({ params }: Props) {
       })
       const data = await res.json()
       if (res.ok) {
+        try {
+          window.sessionStorage.removeItem(FAMILY_REQUEST_DRAFT_KEY)
+        } catch {
+          // ignore storage access issues
+        }
         setBookingRef(data.booking.id)
         setBooked(true)
       } else {
@@ -174,7 +215,7 @@ export default function CaregiverDetail({ params }: Props) {
       <Box sx={{ bgcolor: '#FAFAFA', borderBottom: '1px solid', borderColor: 'grey.100', py: 1.5 }}>
         <Container maxWidth="lg">
           <Stack direction="row" spacing={1} alignItems="center">
-            <Button component={Link} href="/caregivers" startIcon={<ArrowBackIcon />} size="small" sx={{ color: 'text.secondary', fontWeight: 500 }}>Back</Button>
+            <Button component={Link} href={backToListHref} startIcon={<ArrowBackIcon />} size="small" sx={{ color: 'text.secondary', fontWeight: 500 }}>Back</Button>
             <Typography color="text.secondary" fontSize={13}>/</Typography>
             <Typography fontSize={13} color="text.secondary">Caregivers</Typography>
             <Typography color="text.secondary" fontSize={13}>/</Typography>
@@ -243,6 +284,67 @@ export default function CaregiverDetail({ params }: Props) {
                 </Box>
               </CardContent>
             </Card>
+
+            {/* Compatibility Detail (request-aware) */}
+            {compatibilityDetail && (
+              <Card sx={{ borderRadius: 4, boxShadow: '0 4px 24px rgba(0,0,0,0.05)', mb: 3 }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} mb={2}>
+                    <Typography variant="h6" fontWeight={700}>Compatibility Detail</Typography>
+                    <Chip label={`${compatibilityDetail.finalMatch}% Overall Match`} sx={{ bgcolor: '#F0FFF7', color: '#2ECC71', fontWeight: 800 }} />
+                  </Box>
+
+                  <Grid container spacing={1.5} mb={2}>
+                    {[
+                      { label: 'Requirement Fit', value: compatibilityDetail.requirementFit, color: '#FF8C00' },
+                      { label: 'Service Fit', value: compatibilityDetail.serviceFit, color: '#6C63FF' },
+                      { label: 'Cultural Fit', value: compatibilityDetail.culturalFit, color: '#2ECC71' },
+                      { label: 'Confidence', value: compatibilityDetail.confidence, color: '#1DA1F2' },
+                    ].map((metric) => (
+                      <Grid item xs={12} sm={6} key={metric.label}>
+                        <Box display="flex" justifyContent="space-between" mb={0.5}>
+                          <Typography fontSize={12} color="text.secondary">{metric.label}</Typography>
+                          <Typography fontSize={12} fontWeight={700}>{metric.value}%</Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={metric.value}
+                          sx={{
+                            height: 6,
+                            borderRadius: 3,
+                            bgcolor: 'grey.200',
+                            '& .MuiLinearProgress-bar': { borderRadius: 3, bgcolor: metric.color },
+                          }}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+
+                  <Typography fontWeight={700} fontSize={13} mb={0.5}>Why AI recommends this caregiver</Typography>
+                  <Stack spacing={0.5} mb={1.5}>
+                    {compatibilityDetail.reasons.map((reason) => (
+                      <Typography key={reason} fontSize={12} color="text.secondary">• {reason}</Typography>
+                    ))}
+                  </Stack>
+
+                  {!!compatibilityDetail.aiRecommendationDetailed?.length && (
+                    <>
+                      <Typography fontWeight={700} fontSize={13} mb={0.5}>Recommendation detail</Typography>
+                      <Stack spacing={0.5} mb={1.5}>
+                        {compatibilityDetail.aiRecommendationDetailed.slice(0, 3).map((item) => (
+                          <Typography key={item} fontSize={12} color="text.secondary">• {item}</Typography>
+                        ))}
+                      </Stack>
+                    </>
+                  )}
+
+                  <Box sx={{ p: 1.25, borderRadius: 2, bgcolor: '#FFF8F0', border: '1px solid', borderColor: '#FFE1B8' }}>
+                    <Typography fontWeight={700} fontSize={12} mb={0.35}>Potential gap</Typography>
+                    <Typography fontSize={12} color="text.secondary">{compatibilityDetail.potentialGap}</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
 
             {/* About */}
             <Card sx={{ borderRadius: 4, boxShadow: '0 4px 24px rgba(0,0,0,0.05)', mb: 3 }}>

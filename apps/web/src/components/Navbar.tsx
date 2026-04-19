@@ -15,6 +15,7 @@ import TranslateIcon from '@mui/icons-material/Translate'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import LogoutIcon from '@mui/icons-material/Logout'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 import { useAuth } from '@/lib/auth-context'
 import { getTier } from '@/lib/store'
 
@@ -144,6 +145,12 @@ export default function Navbar() {
                       <DashboardIcon fontSize="small" sx={{ color: '#FF6B9D' }} />
                       <Typography fontWeight={600} fontSize={14}>{t('dashboard')}</Typography>
                     </MenuItem>
+                    {user.role === 'CUSTOMER' && (
+                      <MenuItem component={Link} href="/family/requests/new" onClick={() => setUserAnchor(null)} sx={{ gap: 1.5, py: 1.25 }}>
+                        <AssignmentIcon fontSize="small" sx={{ color: '#6C63FF' }} />
+                        <Typography fontWeight={600} fontSize={14}>Family Request</Typography>
+                      </MenuItem>
+                    )}
                     {user.role === 'CAREGIVER' && (
                       <MenuItem component={Link} href="/caregiver-portal" onClick={() => setUserAnchor(null)} sx={{ gap: 1.5, py: 1.25 }}>
                         <Box component="span" sx={{ fontSize: 16, lineHeight: 1 }}>🛡️</Box>
@@ -235,6 +242,11 @@ export default function Navbar() {
                   </Box>
                 </Box>
                 <Button fullWidth variant="outlined" component={Link} href="/dashboard" onClick={() => setDrawerOpen(false)} sx={{ borderRadius: 6, borderColor: '#FF6B9D', color: '#FF6B9D' }}>{t('dashboard')}</Button>
+                {user.role === 'CUSTOMER' && (
+                  <Button fullWidth variant="outlined" component={Link} href="/family/requests/new" onClick={() => setDrawerOpen(false)} sx={{ borderRadius: 6, borderColor: '#6C63FF', color: '#6C63FF' }}>
+                    Family Request
+                  </Button>
+                )}
                 <Button fullWidth variant="outlined" onClick={() => { logout(); setDrawerOpen(false) }} sx={{ borderRadius: 6, borderColor: '#E74C3C', color: '#E74C3C' }}>{t('signOut')}</Button>
               </>
             ) : (

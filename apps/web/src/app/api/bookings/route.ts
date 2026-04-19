@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createBooking, getBookingsByCustomer, getBookingsByCaregiver } from '@/lib/store'
+import { BookingStatus } from '@/lib/types'
 import { INSURANCE_FEE } from '@/lib/mockData'
 
 const PLATFORM_FEE_RATE = 0.15
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
         platformFee,
         isEmergency: Boolean(isEmergency),
         notes: notes || '',
-        status: 'CONFIRMED',
+        status: BookingStatus.Confirmed,
     })
 
     return NextResponse.json({ booking }, { status: 201 })
