@@ -26,9 +26,9 @@ const serviceOptions = [
 ] as const
 
 const familyContextOptions = [
-  { value: 'THAI_LOCAL', label: 'Thai Local Context' },
-  { value: 'MIGRANT_HERITAGE', label: 'Migrant Heritage Context' },
-  { value: 'MIXED', label: 'Mixed Household Context' },
+  { value: 'THAI_LOCAL', label: 'Thai Local' },
+  { value: 'MIGRANT_HERITAGE', label: 'Migrant Heritage' },
+  { value: 'MIXED', label: 'Mixed Household' },
 ] as const
 
 const skillOptions = [
@@ -347,8 +347,8 @@ export default function NewFamilyRequestPage() {
       <Container maxWidth="md" sx={{ py: 5 }}>
         <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100' }}>
           <CardContent sx={{ p: 4 }}>
-            <Typography variant="h5" fontWeight={800} mb={0.5}>Find Caregiver Form</Typography>
-            <Typography color="text.secondary" mb={3}>Use this form for either service. We will use your details to find the best caregiver fit.</Typography>
+            <Typography variant="h5" fontWeight={800} mb={0.5}>Find Your Ideal Caregiver</Typography>
+            <Typography color="text.secondary" mb={3}>Our AI-powered matching system will help you find the perfect caregiver based on cultural compatibility and your specific needs.</Typography>
 
             {!!submitError && (
               <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
@@ -357,6 +357,7 @@ export default function NewFamilyRequestPage() {
             )}
 
             <Stack spacing={2.5}>
+              <Typography fontWeight={800}>Care Details</Typography>
               <TextField label="Care title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
 
               <TextField
@@ -387,9 +388,41 @@ export default function NewFamilyRequestPage() {
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField label="Start date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} InputLabelProps={{ shrink: true }} fullWidth />
-                <TextField label="Location city" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} fullWidth />
+                <TextField label="Location" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} fullWidth />
               </Stack>
 
+              <Typography fontWeight={800}>About Your Child</Typography>
+              {serviceType === 'SPECIAL_NEEDS_TRAINER' ? (
+                <Stack spacing={2.5}>
+                  <TextField
+                    select
+                    label="Child's age"
+                    value={childAgeBand}
+                    onChange={(e) => setChildAgeBand(e.target.value)}
+                    fullWidth
+                  >
+                    {AGE_BAND_OPTIONS.map((band) => (
+                      <MenuItem key={band} value={band}>{band}</MenuItem>
+                    ))}
+                  </TextField>
+                </Stack>
+              ) : (
+                <Stack spacing={2.5}>
+                  <TextField
+                    select
+                    label="Recipient's age"
+                    value={recipientAgeBand}
+                    onChange={(e) => setRecipientAgeBand(e.target.value)}
+                    fullWidth
+                  >
+                    {AGE_BAND_OPTIONS.map((band) => (
+                      <MenuItem key={band} value={band}>{band}</MenuItem>
+                    ))}
+                  </TextField>
+                </Stack>
+              )}
+
+              <Typography fontWeight={800}>Requirements</Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField label="Budget min (THB/hr)" type="number" value={budgetMin} onChange={(e) => setBudgetMin(Number(e.target.value || 0))} fullWidth />
                 <TextField label="Budget max (THB/hr)" type="number" value={budgetMax} onChange={(e) => setBudgetMax(Number(e.target.value || 0))} fullWidth />
@@ -397,7 +430,7 @@ export default function NewFamilyRequestPage() {
 
               <TextField
                 select
-                label="Family context"
+                label="Type of Household"
                 value={familyContext}
                 onChange={(e) => setFamilyContext(e.target.value as 'THAI_LOCAL' | 'MIGRANT_HERITAGE' | 'MIXED')}
                 fullWidth
@@ -408,65 +441,14 @@ export default function NewFamilyRequestPage() {
               </TextField>
 
               <TextField
-                label="Must-have languages (comma-separated)"
+                label="Required languages (comma-separated)"
                 value={mustHaveLanguages}
                 onChange={(e) => setMustHaveLanguages(e.target.value)}
                 fullWidth
               />
 
               <Box>
-                <Typography fontWeight={700} mb={1}>Matching Priority (User POV)</Typography>
-                <Typography fontSize={13} color="text.secondary" mb={1.5}>
-                  Tune what matters more for your family. The system will normalize these three values.
-                </Typography>
-                <Stack spacing={2.25}>
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={0.5}>
-                      <Typography fontSize={13}>Requirements (budget/schedule/language)</Typography>
-                      <Typography fontSize={13} fontWeight={700}>{matchWeightRequirement}</Typography>
-                    </Box>
-                    <Slider
-                      value={matchWeightRequirement}
-                      min={0}
-                      max={100}
-                      step={5}
-                      onChange={(_e, value) => setMatchWeightRequirement(value as number)}
-                      sx={{ color: '#FF8C00' }}
-                    />
-                  </Box>
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={0.5}>
-                      <Typography fontSize={13}>Service expertise (skills/conditions/tasks)</Typography>
-                      <Typography fontSize={13} fontWeight={700}>{matchWeightService}</Typography>
-                    </Box>
-                    <Slider
-                      value={matchWeightService}
-                      min={0}
-                      max={100}
-                      step={5}
-                      onChange={(_e, value) => setMatchWeightService(value as number)}
-                      sx={{ color: '#6C63FF' }}
-                    />
-                  </Box>
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={0.5}>
-                      <Typography fontSize={13}>Cultural fit (context/regional style)</Typography>
-                      <Typography fontSize={13} fontWeight={700}>{matchWeightCultural}</Typography>
-                    </Box>
-                    <Slider
-                      value={matchWeightCultural}
-                      min={0}
-                      max={100}
-                      step={5}
-                      onChange={(_e, value) => setMatchWeightCultural(value as number)}
-                      sx={{ color: '#2ECC71' }}
-                    />
-                  </Box>
-                </Stack>
-              </Box>
-
-              <Box>
-                <Typography fontWeight={700} mb={1}>Must-have skills</Typography>
+                <Typography fontWeight={700} mb={1}>Required skills</Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   {skillOptions.map((skill) => (
                     <ToggleButton
@@ -496,45 +478,20 @@ export default function NewFamilyRequestPage() {
                 </Stack>
               </Box>
 
-              <TextField
-                label="Requirements summary"
-                multiline
-                minRows={3}
-                value={requirementsText}
-                onChange={(e) => setRequirementsText(e.target.value)}
-                placeholder="Summarize your practical requirements and preferred caregiver profile."
-                fullWidth
-              />
-
+              <Typography fontWeight={800}>Priorities & Preferences</Typography>
               {serviceType === 'SPECIAL_NEEDS_TRAINER' ? (
                 <Stack spacing={2.5}>
-                  <Typography fontWeight={700}>Child Development Details</Typography>
-
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    <TextField
-                      select
-                      label="Child age band (1-30)"
-                      value={childAgeBand}
-                      onChange={(e) => setChildAgeBand(e.target.value)}
-                      fullWidth
-                    >
-                      {AGE_BAND_OPTIONS.map((band) => (
-                        <MenuItem key={band} value={band}>{band}</MenuItem>
-                      ))}
-                    </TextField>
-
-                    <TextField
-                      select
-                      label="Session style"
-                      value={childSessionStyle}
-                      onChange={(e) => setChildSessionStyle(e.target.value as 'STRUCTURED' | 'PLAY_BASED' | 'MIXED')}
-                      fullWidth
-                    >
-                      <MenuItem value="STRUCTURED">Structured</MenuItem>
-                      <MenuItem value="PLAY_BASED">Play-based</MenuItem>
-                      <MenuItem value="MIXED">Mixed</MenuItem>
-                    </TextField>
-                  </Stack>
+                  <TextField
+                    select
+                    label="Session style"
+                    value={childSessionStyle}
+                    onChange={(e) => setChildSessionStyle(e.target.value as 'STRUCTURED' | 'PLAY_BASED' | 'MIXED')}
+                    fullWidth
+                  >
+                    <MenuItem value="STRUCTURED">Structured</MenuItem>
+                    <MenuItem value="PLAY_BASED">Play-based</MenuItem>
+                    <MenuItem value="MIXED">Mixed</MenuItem>
+                  </TextField>
 
                   <Box>
                     <Typography fontWeight={700} mb={1}>Primary goals</Typography>
@@ -596,33 +553,17 @@ export default function NewFamilyRequestPage() {
                 </Stack>
               ) : (
                 <Stack spacing={2.5}>
-                  <Typography fontWeight={700}>Daily Living & Companion Details</Typography>
-
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    <TextField
-                      select
-                      label="Recipient age band (1-30)"
-                      value={recipientAgeBand}
-                      onChange={(e) => setRecipientAgeBand(e.target.value)}
-                      fullWidth
-                    >
-                      {AGE_BAND_OPTIONS.map((band) => (
-                        <MenuItem key={band} value={band}>{band}</MenuItem>
-                      ))}
-                    </TextField>
-
-                    <TextField
-                      select
-                      label="Mobility level"
-                      value={mobilityLevel}
-                      onChange={(e) => setMobilityLevel(e.target.value as 'LOW' | 'MODERATE' | 'HIGH')}
-                      fullWidth
-                    >
-                      <MenuItem value="LOW">Low support needed</MenuItem>
-                      <MenuItem value="MODERATE">Moderate support needed</MenuItem>
-                      <MenuItem value="HIGH">High support needed</MenuItem>
-                    </TextField>
-                  </Stack>
+                  <TextField
+                    select
+                    label="Mobility level"
+                    value={mobilityLevel}
+                    onChange={(e) => setMobilityLevel(e.target.value as 'LOW' | 'MODERATE' | 'HIGH')}
+                    fullWidth
+                  >
+                    <MenuItem value="LOW">Low support needed</MenuItem>
+                    <MenuItem value="MODERATE">Moderate support needed</MenuItem>
+                    <MenuItem value="HIGH">High support needed</MenuItem>
+                  </TextField>
 
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                     <TextField
@@ -680,6 +621,69 @@ export default function NewFamilyRequestPage() {
                   </Box>
                 </Stack>
               )}
+
+              
+              <Box>
+                <Typography fontWeight={800}>What Matters Most To You In A Match?</Typography>
+                <Typography fontSize={13} color="text.secondary" mb={1.5}>
+                  Tune what matters more for your family. The system will normalize these three values.
+                </Typography>
+                <Stack spacing={2.25}>
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={0.5}>
+                      <Typography fontSize={13}>Requirements (budget/schedule/language)</Typography>
+                      <Typography fontSize={13} fontWeight={700}>{matchWeightRequirement}</Typography>
+                    </Box>
+                    <Slider
+                      value={matchWeightRequirement}
+                      min={0}
+                      max={100}
+                      step={5}
+                      onChange={(_e, value) => setMatchWeightRequirement(value as number)}
+                      sx={{ color: '#FF8C00' }}
+                    />
+                  </Box>
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={0.5}>
+                      <Typography fontSize={13}>Service expertise (skills/conditions/tasks)</Typography>
+                      <Typography fontSize={13} fontWeight={700}>{matchWeightService}</Typography>
+                    </Box>
+                    <Slider
+                      value={matchWeightService}
+                      min={0}
+                      max={100}
+                      step={5}
+                      onChange={(_e, value) => setMatchWeightService(value as number)}
+                      sx={{ color: '#6C63FF' }}
+                    />
+                  </Box>
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={0.5}>
+                      <Typography fontSize={13}>Cultural fit (context/regional style)</Typography>
+                      <Typography fontSize={13} fontWeight={700}>{matchWeightCultural}</Typography>
+                    </Box>
+                    <Slider
+                      value={matchWeightCultural}
+                      min={0}
+                      max={100}
+                      step={5}
+                      onChange={(_e, value) => setMatchWeightCultural(value as number)}
+                      sx={{ color: '#2ECC71' }}
+                    />
+                  </Box>
+                </Stack>
+              </Box>
+
+              <Typography fontWeight={800}>Additional notes or special requirements</Typography>
+              <TextField
+                label="Is there anything else we should know to find the best match for your family?"
+                multiline
+                minRows={3}
+                value={requirementsText}
+                onChange={(e) => setRequirementsText(e.target.value)}
+                placeholder="Summarize your practical requirements and preferred caregiver profile."
+                fullWidth
+              />
 
               <Stack direction="row" spacing={1.5} justifyContent="flex-end" pt={1}>
                 <Button variant="outlined" onClick={() => router.push('/dashboard')} sx={{ borderRadius: 3 }}>
