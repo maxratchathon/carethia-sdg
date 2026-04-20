@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Alert,
@@ -15,7 +15,6 @@ import {
   Stack,
   TextField,
   ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from '@mui/material'
 import Layout from '@/components/Layout'
@@ -68,6 +67,8 @@ const dailyTaskOptions = [
 const AGE_BAND_OPTIONS = ['1-5', '6-12', '13-17', '18-24', '25-30'] as const
 
 const FAMILY_REQUEST_DRAFT_KEY = 'carethia_family_request_draft_v1'
+const SELECTED_PINK = '#FF6B9D'
+const SELECTED_PINK_HOVER = '#E85C8D'
 
 export default function NewFamilyRequestPage() {
   const { user } = useAuth()
@@ -82,7 +83,6 @@ export default function NewFamilyRequestPage() {
   const [familyContext, setFamilyContext] = useState<'THAI_LOCAL' | 'MIGRANT_HERITAGE' | 'MIXED'>('THAI_LOCAL')
   const [mustHaveLanguages, setMustHaveLanguages] = useState('Thai, English')
   const [mustHaveSkills, setMustHaveSkills] = useState<string[]>(['Special-needs training'])
-  const [status, setStatus] = useState<'DRAFT' | 'ACTIVE'>('DRAFT')
   const [childAgeBand, setChildAgeBand] = useState('6-12')
   const [childSessionStyle, setChildSessionStyle] = useState<'STRUCTURED' | 'PLAY_BASED' | 'MIXED'>('MIXED')
   const [childGoals, setChildGoals] = useState<string[]>(['Communication/language'])
@@ -100,7 +100,7 @@ export default function NewFamilyRequestPage() {
   const [submitError, setSubmitError] = useState<string>('')
   const [draftHydrated, setDraftHydrated] = useState(false)
 
-  const buildDraftPayload = () => ({
+  const buildDraftPayload = useCallback(() => ({
     title,
     serviceType,
     startDate,
@@ -110,7 +110,6 @@ export default function NewFamilyRequestPage() {
     familyContext,
     mustHaveLanguages,
     mustHaveSkills,
-    status,
     childAgeBand,
     childSessionStyle,
     childGoals,
@@ -124,7 +123,30 @@ export default function NewFamilyRequestPage() {
     matchWeightService,
     matchWeightCultural,
     requirementsText,
-  })
+  }), [
+    title,
+    serviceType,
+    startDate,
+    locationCity,
+    budgetMin,
+    budgetMax,
+    familyContext,
+    mustHaveLanguages,
+    mustHaveSkills,
+    childAgeBand,
+    childSessionStyle,
+    childGoals,
+    childConditions,
+    recipientAgeBand,
+    mobilityLevel,
+    complexityLevel,
+    interactionStyle,
+    dailyTaskPriorities,
+    matchWeightRequirement,
+    matchWeightService,
+    matchWeightCultural,
+    requirementsText,
+  ])
 
   useEffect(() => {
     try {
@@ -143,7 +165,6 @@ export default function NewFamilyRequestPage() {
         familyContext: 'THAI_LOCAL' | 'MIGRANT_HERITAGE' | 'MIXED'
         mustHaveLanguages: string
         mustHaveSkills: string[]
-        status: 'DRAFT' | 'ACTIVE'
         childAgeBand: string
         childSessionStyle: 'STRUCTURED' | 'PLAY_BASED' | 'MIXED'
         childGoals: string[]
@@ -168,7 +189,6 @@ export default function NewFamilyRequestPage() {
       if (draft.familyContext !== undefined) setFamilyContext(draft.familyContext)
       if (draft.mustHaveLanguages !== undefined) setMustHaveLanguages(draft.mustHaveLanguages)
       if (draft.mustHaveSkills !== undefined) setMustHaveSkills(draft.mustHaveSkills)
-      if (draft.status !== undefined) setStatus(draft.status)
       if (draft.childAgeBand !== undefined) setChildAgeBand(draft.childAgeBand)
       if (draft.childSessionStyle !== undefined) setChildSessionStyle(draft.childSessionStyle)
       if (draft.childGoals !== undefined) setChildGoals(draft.childGoals)
@@ -199,32 +219,7 @@ export default function NewFamilyRequestPage() {
     } catch {
       // Storage may be blocked; fail silently for UX continuity
     }
-  }, [
-    draftHydrated,
-    title,
-    serviceType,
-    startDate,
-    locationCity,
-    budgetMin,
-    budgetMax,
-    familyContext,
-    mustHaveLanguages,
-    mustHaveSkills,
-    status,
-    childAgeBand,
-    childSessionStyle,
-    childGoals,
-    childConditions,
-    recipientAgeBand,
-    mobilityLevel,
-    complexityLevel,
-    interactionStyle,
-    dailyTaskPriorities,
-    matchWeightRequirement,
-    matchWeightService,
-    matchWeightCultural,
-    requirementsText,
-  ])
+  }, [draftHydrated, buildDraftPayload])
 
   const canSubmit = useMemo(
     () => title.trim().length > 4 && budgetMax >= budgetMin,
@@ -281,7 +276,7 @@ export default function NewFamilyRequestPage() {
         budgetMin,
         budgetMax,
         familyContext,
-        status,
+        status: 'ACTIVE',
         mustHaveLanguages: mustHaveLanguages.split(',').map((item) => item.trim()).filter(Boolean),
         mustHaveSkills,
         niceToHaveSkills: [],
@@ -330,18 +325,18 @@ export default function NewFamilyRequestPage() {
         return
       }
 
-      let message = 'Unable to create request. Please try again.'
+      let message = 'Unable to find caregivers right now. Please try again.'
       try {
         const data = await res.json()
         if (data?.error) {
           message = data.error
         }
       } catch {
-        message = `Unable to create request (HTTP ${res.status}).`
+        message = `Unable to find caregivers right now (HTTP ${res.status}).`
       }
       setSubmitError(message)
     } catch {
-      setSubmitError('Network error while creating request. Please check your connection and try again.')
+      setSubmitError('Network error while finding caregivers. Please check your connection and try again.')
     } finally {
       setSaving(false)
     }
@@ -352,8 +347,8 @@ export default function NewFamilyRequestPage() {
       <Container maxWidth="md" sx={{ py: 5 }}>
         <Card sx={{ borderRadius: 4, border: '1px solid', borderColor: 'grey.100' }}>
           <CardContent sx={{ p: 4 }}>
-            <Typography variant="h5" fontWeight={800} mb={0.5}>Create Family Care Request</Typography>
-            <Typography color="text.secondary" mb={3}>Use this form for either service. You can add more requests anytime.</Typography>
+            <Typography variant="h5" fontWeight={800} mb={0.5}>Find Caregiver Form</Typography>
+            <Typography color="text.secondary" mb={3}>Use this form for either service. We will use your details to find the best caregiver fit.</Typography>
 
             {!!submitError && (
               <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
@@ -362,7 +357,7 @@ export default function NewFamilyRequestPage() {
             )}
 
             <Stack spacing={2.5}>
-              <TextField label="Request title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+              <TextField label="Care title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
 
               <TextField
                 select
@@ -480,7 +475,20 @@ export default function NewFamilyRequestPage() {
                       value={skill}
                       selected={mustHaveSkills.includes(skill)}
                       onChange={() => toggleSkill(skill)}
-                      sx={{ mb: 1, borderRadius: 3, textTransform: 'none' }}
+                      sx={{
+                        mb: 1,
+                        borderRadius: 3,
+                        textTransform: 'none',
+                        '&.Mui-selected': {
+                          backgroundColor: SELECTED_PINK,
+                          borderColor: SELECTED_PINK,
+                          color: '#fff',
+                        },
+                        '&.Mui-selected:hover': {
+                          backgroundColor: SELECTED_PINK_HOVER,
+                          borderColor: SELECTED_PINK_HOVER,
+                        },
+                      }}
                     >
                       {skill}
                     </ToggleButton>
@@ -538,9 +546,19 @@ export default function NewFamilyRequestPage() {
                             key={goal}
                             label={goal}
                             clickable
-                            color={selected ? 'primary' : 'default'}
                             onClick={() => toggleItem(goal, setChildGoals)}
-                            sx={{ mb: 1, borderRadius: 3 }}
+                            sx={{
+                              mb: 1,
+                              borderRadius: 3,
+                              ...(selected
+                                ? {
+                                    backgroundColor: SELECTED_PINK,
+                                    borderColor: SELECTED_PINK,
+                                    color: '#fff',
+                                    '&:hover': { backgroundColor: SELECTED_PINK_HOVER },
+                                  }
+                                : {}),
+                            }}
                           />
                         )
                       })}
@@ -557,9 +575,19 @@ export default function NewFamilyRequestPage() {
                             key={condition}
                             label={condition}
                             clickable
-                            color={selected ? 'secondary' : 'default'}
                             onClick={() => toggleItem(condition, setChildConditions)}
-                            sx={{ mb: 1, borderRadius: 3 }}
+                            sx={{
+                              mb: 1,
+                              borderRadius: 3,
+                              ...(selected
+                                ? {
+                                    backgroundColor: SELECTED_PINK,
+                                    borderColor: SELECTED_PINK,
+                                    color: '#fff',
+                                    '&:hover': { backgroundColor: SELECTED_PINK_HOVER },
+                                  }
+                                : {}),
+                            }}
                           />
                         )
                       })}
@@ -632,9 +660,19 @@ export default function NewFamilyRequestPage() {
                             key={task}
                             label={task}
                             clickable
-                            color={selected ? 'primary' : 'default'}
                             onClick={() => toggleItem(task, setDailyTaskPriorities)}
-                            sx={{ mb: 1, borderRadius: 3 }}
+                            sx={{
+                              mb: 1,
+                              borderRadius: 3,
+                              ...(selected
+                                ? {
+                                    backgroundColor: SELECTED_PINK,
+                                    borderColor: SELECTED_PINK,
+                                    color: '#fff',
+                                    '&:hover': { backgroundColor: SELECTED_PINK_HOVER },
+                                  }
+                                : {}),
+                            }}
                           />
                         )
                       })}
@@ -643,23 +681,8 @@ export default function NewFamilyRequestPage() {
                 </Stack>
               )}
 
-              <Box>
-                <Typography fontWeight={700} mb={1}>Save as</Typography>
-                <ToggleButtonGroup
-                  exclusive
-                  value={status}
-                  onChange={(_event, value) => {
-                    if (value) setStatus(value)
-                  }}
-                  size="small"
-                >
-                  <ToggleButton value="DRAFT">Draft</ToggleButton>
-                  <ToggleButton value="ACTIVE">Active (start matching)</ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
-
               <Stack direction="row" spacing={1.5} justifyContent="flex-end" pt={1}>
-                <Button variant="outlined" onClick={() => router.push('/family/requests')} sx={{ borderRadius: 3 }}>
+                <Button variant="outlined" onClick={() => router.push('/dashboard')} sx={{ borderRadius: 3 }}>
                   Cancel
                 </Button>
                 <Button
@@ -668,7 +691,7 @@ export default function NewFamilyRequestPage() {
                   disabled={!canSubmit || saving}
                   sx={{ borderRadius: 3, background: 'linear-gradient(135deg, #FF6B9D, #C06C84)', fontWeight: 700 }}
                 >
-                  {saving ? 'Saving...' : 'Create Request'}
+                  {saving ? 'Saving...' : 'Find Caregiver'}
                 </Button>
               </Stack>
             </Stack>

@@ -11,7 +11,6 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import StarIcon from '@mui/icons-material/Star'
-import AddIcon from '@mui/icons-material/Add'
 import Layout from '@/components/Layout'
 import { mockCaregivers, SERVICE_ICONS, SERVICE_LABELS, SERVICE_COLORS } from '@/lib/mockData'
 import type { ServiceType } from '@/lib/mockData'
@@ -85,7 +84,7 @@ export default function Dashboard() {
               <Button
                 variant="contained"
                 component={Link}
-                href="/caregivers"
+                href="/family/requests/new"
                 sx={{
                   background: 'linear-gradient(135deg, #FF6B9D, #C06C84)',
                   borderRadius: 3,
@@ -94,15 +93,6 @@ export default function Dashboard() {
                 }}
               >
                 Find Caregiver
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                component={Link}
-                href="/family/requests/new"
-                sx={{ borderRadius: 3, fontWeight: 600, borderColor: '#6C63FF', color: '#6C63FF' }}
-              >
-                New Care Request
               </Button>
             </Stack>
           </Box>
