@@ -26,9 +26,9 @@ const serviceOptions = [
 ] as const
 
 const familyContextOptions = [
-  { value: 'THAI_LOCAL', label: 'Thai Local' },
-  { value: 'MIGRANT_HERITAGE', label: 'Migrant Heritage' },
-  { value: 'MIXED', label: 'Mixed Household' },
+  { value: 'THAI_LOCAL', label: 'Thai household' },
+  { value: 'MIGRANT_HERITAGE', label: 'International / Expat household' },
+  { value: 'MIXED', label: 'Multicultural household' },
 ] as const
 
 const skillOptions = [
@@ -430,7 +430,7 @@ export default function NewFamilyRequestPage() {
 
               <TextField
                 select
-                label="Type of Household"
+                label="Home environment"
                 value={familyContext}
                 onChange={(e) => setFamilyContext(e.target.value as 'THAI_LOCAL' | 'MIGRANT_HERITAGE' | 'MIXED')}
                 fullWidth
